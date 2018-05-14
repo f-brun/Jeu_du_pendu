@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "27.0.3"
-    compileSdkVersion 26
+    buildToolsVersion "25.0.3"
+    compileSdkVersion 25
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -18,9 +18,9 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "fr.jeux.pendu"
+        applicationId "com.mygdx.game"
         minSdkVersion 9
-        targetSdkVersion 26
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -79,7 +79,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.jeux.pendu/fr.jeux.pendu.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.mygdx.game/com.mygdx.game.AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.
