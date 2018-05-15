@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Jeu_du_pendu-android
+Bundle-SymbolicName: Jeu_du_pendu-android
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: Jeu_du_pendu-android.jar,
+  android-sdk/platforms/android-19/android.jar
+Export-Package: fr.jeux.pendu
