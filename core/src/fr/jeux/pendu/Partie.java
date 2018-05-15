@@ -1,20 +1,17 @@
 package fr.jeux.pendu;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 import static com.badlogic.gdx.utils.Timer.schedule;
 import static fr.jeux.pendu.GestionMots.SepareParDesEspaces;
-import static fr.jeux.pendu.GestionMots.cfg;
 
+@SuppressWarnings("static-access")
 /**
  *
  * @author Florent
@@ -70,6 +67,7 @@ public class Partie {
             cfg.tPartie.setDebug(true); // This is optional, but enables debug lines for tables.
         }
         cfg.lMotDevine = new Label(cfg.motDevine, cfg.skin);
+        cfg.lMotDevine.setFontScale(3);
         cfg.affichagePendu = new Image(cfg.imagePendu[0]);
 
         cfg.tPartie.pad(3);
@@ -102,6 +100,7 @@ public class Partie {
             System.out.println("Gagné !");
         }
         cfg.lMotDevine.setText(SepareParDesEspaces(cfg.motDevine));
+        cfg.lMotDevine.setFontScale(3);
 
         cfg.score++ ;
         
@@ -112,6 +111,7 @@ public class Partie {
                 cfg.tPartie.reset();       //Efface l'écran de la partie
                 
                 lAffichageScore = new Label("Score : " + Integer.toString(cfg.score), cfg.skin);
+                lAffichageScore.setFontScale(3);
                 if (img != null) img.dispose();
                 img = new Texture(cfg.IMAGE_GAGNE);
                 imageFin = new Image(img);
@@ -163,6 +163,7 @@ public class Partie {
         cfg.tPartie.reset();       //Efface l'écran de la partie
 
         lAffichageScore =new Label("Score final : "+ Integer.toString(cfg.score),cfg.skin) ;
+        lAffichageScore.setFontScale(3);
         cfg.score = 0 ;     //On remet le score à zéro après l'avoir affiché
         
         if (img != null) img.dispose();
@@ -176,6 +177,7 @@ public class Partie {
         else {
             lPerdu.setText(textePerdu);
         }
+        lPerdu.setFontScale(3);
         
         if (cfg.tFin == null) {
             cfg.tFin = new Table() ;

@@ -54,7 +54,8 @@ public class Pendu extends ApplicationAdapter {
         if (cfg.DEBUG) cfg.tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
 
         boutton = new TextButton("Jouer", cfg.skin);
-        titre = new Label("Jeu du pendu", cfg.skin);
+        titre = new Label("Jeu du pendu\n", cfg.skin);
+        titre.setFontScale(3);	//Augmente la taille de la police
         img = new Texture("images/pendu11.png");
         imageTitre = new Image(img);
 
