@@ -1,7 +1,9 @@
 package fr.jeux.pendu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -21,8 +23,11 @@ public class Config {
     public static boolean DEBUG = false ;
     public static final int TAILLE_BUFFER = 256*1024 ;   //Taille du buffer de lecture du dictionnaire
     public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
+    public static final String POLICE_MOTS = "Consolas.fnt" ;
     public static int largeurEcran ;
     public static int hauteurEcran ;
+    public static BitmapFont policeMots ;
+    public static Label.LabelStyle styleMots ;
     public static Stage stage ;
     public static Table tMenu ;  //Table contenant le menu
     public static Table tPartie ;  //Table contenant la partie
@@ -54,6 +59,11 @@ public class Config {
     skin = new Skin(Gdx.files.internal(CHEMIN_SKIN)) ;
     stage = new Stage(new StretchViewport(LARGEUR_CIBLE,HAUTEUR_CIBLE));
     partie = null ; //Au début il n'y a pas de partie en cours
+    policeMots = new BitmapFont(Gdx.files.internal(POLICE_MOTS));
+    styleMots = new Label.LabelStyle();
+    styleMots.font = policeMots ;
+    styleMots.fontColor = Color.WHITE;
+    
     Gdx.input.setInputProcessor(stage);
     score = 0 ;
     }

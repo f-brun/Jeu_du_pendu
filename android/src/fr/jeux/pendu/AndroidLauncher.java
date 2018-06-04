@@ -1,5 +1,6 @@
 package fr.jeux.pendu;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -13,4 +14,7 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new Pendu(), config);
 	}
+    public void onConfigurationChanged (Configuration newConfig) {
+    	super.onConfigurationChanged (newConfig) ;
+    }
 }
