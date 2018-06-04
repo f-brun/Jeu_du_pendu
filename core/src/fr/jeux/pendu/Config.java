@@ -48,8 +48,8 @@ public class Config {
     public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
     public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
-    public static final String FICHIER_DICTIONNAIRE = "liste_francais.txt" ; //Fichier contenant les mots à deviner
-    public static ArrayList<String> listeMots ; // Liste des mots à deviner
+    public static final String FICHIER_DICTIONNAIRE = "liste_filtree.txt" ; //Fichier contenant les mots à deviner
+    public static String[] listeMots ; // Liste des mots à deviner
     public static int nombreMotsDico ; //Nombre de mots dans le dictionnaire des mots à deviner
     public static int score ;   //score = nb de mots devinnés d'affilé
     
