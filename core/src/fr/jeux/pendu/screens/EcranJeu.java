@@ -12,8 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import fr.jeux.pendu.Pendu;
@@ -41,6 +44,8 @@ public class EcranJeu implements Screen {
 //    Label	lAffichageScore ; //Label pour afficher le score actuel
 
     Table	tLettres;    //Element d'UI contenant les lettres
+    Cell	celluleLettres ;	//Cellule contenant les lettres à cliquer (sert pour redimensionner la cellule)
+    Cell	celluleMotDevine ;	//Cellule contenant le texte du mot deviné jusqu'à là (sert pour redimensionner)
     
 //    protected Boolean retourMenu;  //Indique que la partie est finie et qu'il faut revenir au menu
 
@@ -72,7 +77,7 @@ public class EcranJeu implements Screen {
         GestionnaireDeClics gestionnaireDeClics;   //Fonction qui va gérer les clics sur les boutons de lettres
         int i;
 
-        stage = new Stage(new StretchViewport(jeu.getLargeurEcran(),jeu.getHauteurEcran()));
+        stage = new Stage(new ScreenViewport());
         table = new Table();
         table.setFillParent(true);  //La table occupe tout l'écran
         
@@ -82,17 +87,19 @@ public class EcranJeu implements Screen {
             table.setDebug(true); // This is optional, but enables debug lines for tables.
         }
         jeu.lMotDevine = new Label("", jeu.styleMots);
+        jeu.lMotDevine.setWrap(true);					//Permet de mettre le texte sur plusieurs lignes si nécessaire
+        jeu.lMotDevine.setAlignment(Align.center);		//Aligne horizontalement
         jeu.affichagePendu = new Image(jeu.getImagesPendu()[0]);
 
         table.pad(3);
-        table.add(jeu.lMotDevine);
+        celluleMotDevine = table.add(jeu.lMotDevine).align(Align.center).width(jeu.getLargeurEcran()) ;	//Le mot est centré sur l'écran
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
         table.add(jeu.affichagePendu);
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
 
         //Définit la table qui contient les boutons des lettres à proposer
         tLettres = new Table();
-        table.add(tLettres);
+        celluleLettres = table.add(tLettres).width(jeu.getLargeurEcran());
 
         i = 0;
         gestionnaireDeClics = new GestionnaireDeClics(jeu);
@@ -103,7 +110,8 @@ public class EcranJeu implements Screen {
             }
             i++;
             bouton.addListener(gestionnaireDeClics);
-            tLettres.add(bouton);
+            tLettres.add(bouton).minWidth(jeu.LARGEUR_MIN_BOUTONS_LETTRES).maxWidth(jeu.LARGEUR_MAX_BOUTONS_LETTRES)
+            					.minHeight(jeu.HAUTEUR_MIN_BOUTONS_LETTRES).maxHeight(jeu.HAUTEUR_MAX_BOUTONS_LETTRES);
         }
     }
 
@@ -178,7 +186,12 @@ public class EcranJeu implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
+    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
     	
+    	if (table != null) {
+    		celluleLettres.width(width);
+    		celluleMotDevine.width(width) ;
+    	}
         stage.getViewport().update(width, height, true);
     }
 

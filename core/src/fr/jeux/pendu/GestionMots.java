@@ -28,7 +28,7 @@ public class GestionMots {
        motAAfficher = "";
        for (int i = 0; i < mot.length(); i++) {
            motAAfficher += mot.charAt(i);
-           if (i != mot.length()) {
+           if (i != mot.length()-1) {
                motAAfficher += " ";
            }
        }

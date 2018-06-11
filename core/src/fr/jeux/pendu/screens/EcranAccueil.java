@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import fr.jeux.pendu.Pendu ;
 
@@ -33,7 +33,7 @@ public class EcranAccueil implements Screen {
     	
     	jeu.setEcranAccueil(this) ; 	//Enregistre la référence de cet écran
     	
-        stage = new Stage(new StretchViewport(jeu.getLargeurEcran(),jeu.getHauteurEcran()));
+        stage = new Stage(new ScreenViewport());
 
         Gdx.input.setInputProcessor(stage);
 
@@ -87,6 +87,7 @@ public class EcranAccueil implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
+    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
         stage.getViewport().update(width, height, true);
     }
 

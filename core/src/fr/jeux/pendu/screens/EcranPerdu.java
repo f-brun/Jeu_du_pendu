@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import fr.jeux.pendu.Pendu;
 
@@ -21,7 +23,9 @@ public class EcranPerdu implements Screen {
     private static Label lAffichageScore = null ;
     private static Texture img = null ; 
     private static Image imagePerdu = null ;
-    private static Label lPerdu = null ;
+    private static Label lTexteATrouver = null ;
+    
+    Cell	celluleTexteATrouver ;
 
     Pendu jeu ;	//référence aux données du jeu
     
@@ -32,13 +36,11 @@ public class EcranPerdu implements Screen {
     	if (jeu.getEcranPerdu() == null) jeu.setEcranPerdu(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
-//    	actualiseUI() ;
-//        jeu.setScore(0) ;     //On remet le score à zéro après l'avoir affiché
     }
     
     private void creeUI() {
 
-       	stage = new Stage(new StretchViewport(jeu.getLargeurEcran(),jeu.getHauteurEcran()));
+       	stage = new Stage(new ScreenViewport());
 
         Gdx.input.setInputProcessor(stage);		//Met le focus sur notre écran
         
@@ -56,8 +58,10 @@ public class EcranPerdu implements Screen {
        	imagePerdu = new Image(img);
 
         //Crée le label contenant le mot à trouver
-        lPerdu = new Label("",jeu.skin) ;
-        lPerdu.setFontScale(3);
+        lTexteATrouver = new Label("",jeu.skin) ;
+        lTexteATrouver.setFontScale(3);
+        lTexteATrouver.setWrap(true);
+        lTexteATrouver.setAlignment(Align.center);
         
         table = new Table() ;
 
@@ -69,7 +73,7 @@ public class EcranPerdu implements Screen {
         table.row();
         table.add(imagePerdu);
         table.row() ;    //Place le texte en dessous de l'image
-        table.add(lPerdu) ;
+        celluleTexteATrouver = table.add(lTexteATrouver).align(Align.center).width(jeu.getLargeurEcran()) ;
         table.setVisible(true) ;
 
         stage.addActor(table) ;
@@ -88,7 +92,7 @@ public class EcranPerdu implements Screen {
     
     private void actualiseUI() {
         lAffichageScore.setText("Score final : "+ Integer.toString(jeu.getScore()));
-        lPerdu.setText("Il fallait trouver : "+jeu.motADeviner);
+        lTexteATrouver.setText("Il fallait trouver :\n"+jeu.motADeviner);
 
     }
 
@@ -103,6 +107,12 @@ public class EcranPerdu implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
+    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+    	
+    	if (table != null) {
+    		celluleTexteATrouver.width(width) ;
+    	}
+    	
         stage.getViewport().update(width, height, true);
     }
 

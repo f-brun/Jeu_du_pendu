@@ -18,11 +18,15 @@ import fr.jeux.pendu.screens.* ;
 
 public class Pendu extends Game {
 
-    public static boolean DEBUG = false ;
+    public static boolean DEBUG = true ;
     public static final int TAILLE_BUFFER = 256*1024 ;   //Taille du buffer de lecture du dictionnaire
     public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
     public static final String POLICE_MOTS = "Consolas.fnt" ;
     public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
+    public static final int LARGEUR_MIN_BOUTONS_LETTRES = 30 ; //Largeur minimale des boutons représentant les lettres
+    public static final int LARGEUR_MAX_BOUTONS_LETTRES = 160 ; //Largeur maximale des boutons représentant les lettres
+    public static final int HAUTEUR_MIN_BOUTONS_LETTRES = 15 ; //Hauteur minimale des boutons représentant les lettres
+    public static final int HAUTEUR_MAX_BOUTONS_LETTRES = 60 ; //Hauteur maximale des boutons représentant les lettres
     public static int largeurEcran ;
     public static int hauteurEcran ;
     public static BitmapFont policeMots ;
@@ -111,7 +115,6 @@ public class Pendu extends Game {
 	        ligne = handle.readString();
 	    }
 	    try {
-	        System.out.println("Debut lecture dico");
 	        Gdx.app.log("INFO", "Debut lecture dico");
 	         	
 	    	reader = new BufferedReader(Gdx.files.internal(fichier).reader(),TAILLE_BUFFER);

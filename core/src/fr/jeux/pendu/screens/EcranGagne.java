@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import fr.jeux.pendu.Pendu;
 
@@ -37,7 +37,7 @@ public class EcranGagne implements Screen {
     }
     private void creeUI() {
 
-       	stage = new Stage(new StretchViewport(jeu.getLargeurEcran(),jeu.getHauteurEcran()));
+       	stage = new Stage(new ScreenViewport());
 
         Gdx.input.setInputProcessor(stage);		//Met le focus sur notre écran
         
@@ -97,6 +97,7 @@ public class EcranGagne implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
+    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
         stage.getViewport().update(width, height, true);
     }
 
