@@ -21,7 +21,8 @@ public class EcranReglages implements Screen {
     public Stage stage ;
     public Table table ;  //Table contenant les choix
 
-    private TextButton boutonFra, boutonEng, boutonRetour;
+    private TextButton[] boutonLangue ;
+    private TextButton boutonRetour;
     private Label titre, langueChoisie;
     public ChangeListener	listenerLangues ;
     
@@ -44,24 +45,39 @@ public class EcranReglages implements Screen {
 
         titre = new Label("Reglages\n", jeu.getSkin());
         titre.setFontScale(3);	//Augmente la taille de la police
-
-        boutonFra = new TextButton(jeu.listeDictionnaires[0][1], jeu.getSkin());
-        boutonEng = new TextButton(jeu.listeDictionnaires[1][1], jeu.getSkin());
-        boutonRetour = new TextButton("Retour", jeu.getSkin());
-        
-        langueChoisie = new Label("\nLangue en cours : "+jeu.listeDictionnaires[0][1], jeu.getSkin()) ;
-        
         table.pad(3);
         table.add(titre);
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        table.add(boutonFra) ;
-        table.row();
-        table.add(boutonEng) ;
-        table.row();
+
+        boutonLangue = new TextButton[jeu.listeDictionnaires.length] ;
+
+        //Prépare le listener des boutons langue
+        listenerLangues = new ChangeListener() {
+            public void changed(ChangeEvent event, Actor acteur) {
+                if (acteur instanceof TextButton) {
+                	int index ;
+                	//On récupère l'index à partir du début de la chaîne du nom du bouton
+                	index = Integer.parseInt(((TextButton)acteur).getText().toString().substring(1,((TextButton)acteur).getText().toString().indexOf("-")-1)) ;
+                	jeu.dictionnaire = new Dictionnaire(jeu.listeDictionnaires[index-1][2]) ; //Et on charge le dictionnaire correspondant
+                	langueChoisie.setText("\nLangue en cours : "+jeu.dictionnaire.getLangue());
+                }
+            }
+        } ;
+
+        
+        for (int i = 0 ; i < jeu.listeDictionnaires.length ; i++) {
+        	boutonLangue[i] = new TextButton(" "+(i+1)+" - "+jeu.listeDictionnaires[i][0]+ " ("+jeu.listeDictionnaires[i][1]+" mots) ",jeu.getSkin());
+        	boutonLangue[i].addListener(listenerLangues) ;
+            table.add(boutonLangue[i]) ;	//Ajoute le bouton à l'UI
+            table.row();					//Et passe à la ligne suivante
+        }
+
+        boutonRetour = new TextButton("Retour", jeu.getSkin());
+        langueChoisie = new Label("\nLangue en cours : "+jeu.dictionnaire.getLangue(), jeu.getSkin()) ;
+
         table.add(boutonRetour) ;
         table.row();
         table.add(langueChoisie) ;
-
     
         boutonRetour.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
@@ -71,32 +87,6 @@ public class EcranReglages implements Screen {
             }
         } ) ;
         
-        listenerLangues = new ChangeListener() {
-            public void changed(ChangeEvent event, Actor acteur) {
-                if (acteur instanceof TextButton) {
-                	int i ;
-                	String a,b ;
-                	for ( i = 0 ; i < jeu.listeDictionnaires.length ; i++) {
-                		a = ((TextButton)acteur).getText().toString() ;
-                		b = jeu.listeDictionnaires[i][1] ;
-                		if (((TextButton)acteur).getText().toString().equals(jeu.listeDictionnaires[i][1])) {
-                			break ;
-                		}
-                	}
-                	if (i>1) {
-                		Gdx.app.log("BUG"," i = "+i);
-                		i = 1 ;
-                	}
-                	langueChoisie.setText("\nLangue en cours : "+jeu.listeDictionnaires[i][0]) ;
-                	jeu.dictionnaire = new Dictionnaire(jeu.listeDictionnaires[i][2]) ; 
-//                	langueChoisie.setText("\nLangue en cours : "+jeu.dictionnaire.getLangue()) ;
-                }
-            }
-        } ;
-
-        boutonFra.addListener(listenerLangues) ;
-        boutonEng.addListener(listenerLangues) ;
-
     }
 
     @Override

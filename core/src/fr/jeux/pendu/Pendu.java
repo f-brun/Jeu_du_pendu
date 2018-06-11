@@ -53,10 +53,13 @@ public class Pendu extends Game {
     public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
     public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
-    public static final String FICHIER_DICTIONNAIRE = "Dictionnaires/Français.txt" ; //Fichier contenant les mots à deviner
-    public static final String[][]	listeDictionnaires =	{ { "Francais", "Dictionnaire francais", "Dictionnaires/Francais.txt"},
-    														  { "English", "English dictionary", "Dictionnaires/English.txt"} };
-    
+//    public static final String FICHIER_DICTIONNAIRE = "Dictionnaires/Français.txt" ; //Fichier contenant les mots à deviner
+    public static final String CHEMIN_FICHIERS_DICTIONNAIRES = "Dictionnaires/" ;	//Chemin vers les fichiers dictionnaires
+    public static String[][]	listeDictionnaires ;
+    	
+    /*	{ { "Francais", "Dictionnaire francais", "Dictionnaires/Francais.txt"},
+    														  { "Anglais", "English dictionary", "Dictionnaires/Anglais.txt"} };
+    */
     public static Dictionnaire	dictionnaire ;	//Dictionnaire en cours
     public static int score ;   //score = nb de mots devinnés d'affilé	
 	
@@ -81,7 +84,9 @@ public class Pendu extends Game {
         
         //Chargement des éléments en mémoire
         ChargeImagesPendu();		//Les images de la pendaison progressive
-        dictionnaire = new Dictionnaire(FICHIER_DICTIONNAIRE);		//Initialisation du dictionnaire
+        
+        listeDictionnaires = Dictionnaire.getListeDictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
+        dictionnaire = new Dictionnaire(listeDictionnaires[0][2]);		//Initialisation du premier dictionnaire
         
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
