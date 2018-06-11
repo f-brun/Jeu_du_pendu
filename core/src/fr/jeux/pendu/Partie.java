@@ -42,7 +42,7 @@ public class Partie {
         cfg.nbErreurs = 0;
         cfg.nbErreursMax = (cfg.NB_IMAGES - 1) / niveau;
         int i; //index
-        cfg.motADeviner = cfg.listeMots.get((int) (Math.random() * cfg.nombreMotsDico));
+        cfg.motADeviner = cfg.listeMots[(int) (Math.random() * cfg.nombreMotsDico)];
 //Crée le mot deviné en remplaçant toutes les lettres par des sous-tirets
         cfg.motDevine = "";
         for (i = 0; i < cfg.motADeviner.length(); i++) {
@@ -66,8 +66,7 @@ public class Partie {
         if (cfg.DEBUG) {
             cfg.tPartie.setDebug(true); // This is optional, but enables debug lines for tables.
         }
-        cfg.lMotDevine = new Label(cfg.motDevine, cfg.skin);
-        cfg.lMotDevine.setFontScale(3);
+        cfg.lMotDevine = new Label(SepareParDesEspaces(cfg.motDevine), cfg.styleMots);
         cfg.affichagePendu = new Image(cfg.imagePendu[0]);
 
         cfg.tPartie.pad(3);
@@ -100,7 +99,7 @@ public class Partie {
             System.out.println("Gagné !");
         }
         cfg.lMotDevine.setText(SepareParDesEspaces(cfg.motDevine));
-        cfg.lMotDevine.setFontScale(3);
+
 
         cfg.score++ ;
         

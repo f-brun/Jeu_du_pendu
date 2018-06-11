@@ -18,6 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Scaling;
+
+import android.content.res.Configuration;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,7 +86,6 @@ public class Pendu extends ApplicationAdapter {
         });
       
         ChargeImagesPendu();
-        cfg.listeMots = new ArrayList<String>();	//Initialise la liste pour les mots à deviner
         try {
             RempliListeMot(cfg.FICHIER_DICTIONNAIRE);
         } catch (FileNotFoundException e) {
@@ -121,16 +123,26 @@ public class Pendu extends ApplicationAdapter {
             ligne = handle.readString();
         }
         try {
-            reader = new BufferedReader(Gdx.files.internal(fichier).reader(),cfg.TAILLE_BUFFER);
+            System.out.println("Debut lecture dico");
+            Gdx.app.log("INFO", "Debut lecture dico");
+             	
+        	reader = new BufferedReader(Gdx.files.internal(fichier).reader(),cfg.TAILLE_BUFFER);
+            
+            if (cfg.DEBUG) {
+                System.out.println("Lecture de la première ligne pour obtenir le nombre de mots ...");
+            }
+            cfg.nombreMotsDico = Integer.parseInt(reader.readLine());	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
+            if (cfg.DEBUG) {
+                System.out.println("Il y a "+cfg.nombreMotsDico+" mots. Création du tableau pour les stocker...");
+            }
         } catch (Exception e) {
             reader = null ;
         }
 
-        System.out.println("Debut lecture dico");
-        Gdx.app.log("INFO", "Debut lecture dico");
-        
+        cfg.listeMots = new String[cfg.nombreMotsDico] ;		//Allocation du tableau pour stocker les mots
         finLecture = false ;
-        while (!finLecture) {
+        int i = 0 ;
+        while (!finLecture && (i < cfg.nombreMotsDico)) {
             ligne = null;
             try {
                 ligne = reader.readLine();
@@ -144,13 +156,12 @@ public class Pendu extends ApplicationAdapter {
                     System.out.println("Fin de fichier !");
                 }
             } else {
-                cfg.listeMots.add(ligne);
+            	cfg.listeMots[i++] = ligne;
             }
         }
-        cfg.nombreMotsDico = cfg.listeMots.size() ;
     }
 
-    void EcritListeMots() throws IOException {
+/*    void EcritListeMots() throws IOException {
         FileWriter f = new FileWriter("D:/Dictionnaire.txt") ;
         try {
             for (int i = 0 ; i<cfg.listeMots.size();i++) {
@@ -167,7 +178,7 @@ public class Pendu extends ApplicationAdapter {
         
             
         }
-         
+*/         
        
     @Override
     public void render() {
@@ -178,6 +189,8 @@ public class Pendu extends ApplicationAdapter {
     }
 
     public void resize(int width, int height) {
+    	cfg.hauteurEcran = height ;
+    	cfg.largeurEcran = width ;
         cfg.stage.getViewport().update(width, height, true);
     }
 
