@@ -11,6 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+
+import fr.jeux.pendu.screens.EcranJeu;
+
 import java.util.ArrayList;
 /**
  *
@@ -34,7 +37,7 @@ public class Config {
     public static Table tFin ;  //Table contenant l'écran de fin (gagné ou perdu)
     public static Skin skin ; //Skin utilisée par l'UI
     public static Image affichagePendu;  //Elément d'UI contenant l'image du pendu
-    public static Partie partie ; //Instance de la partie en cours
+    public static EcranJeu ecranJeu ; //Instance de la partie en cours
     public static String motADeviner ;
     public static String motDevine ;
     public static Label lMotDevine; //texte du mot à deviner
@@ -53,12 +56,12 @@ public class Config {
     public static int nombreMotsDico ; //Nombre de mots dans le dictionnaire des mots à deviner
     public static int score ;   //score = nb de mots devinnés d'affilé
     
-    Config() {
+    public Config() {
     largeurEcran = Gdx.graphics.getWidth();
     hauteurEcran = Gdx.graphics.getHeight();
     skin = new Skin(Gdx.files.internal(CHEMIN_SKIN)) ;
     stage = new Stage(new StretchViewport(LARGEUR_CIBLE,HAUTEUR_CIBLE));
-    partie = null ; //Au début il n'y a pas de partie en cours
+    ecranJeu = null ; //Au début il n'y a pas de partie en cours
     policeMots = new BitmapFont(Gdx.files.internal(POLICE_MOTS));
     styleMots = new Label.LabelStyle();
     styleMots.font = policeMots ;

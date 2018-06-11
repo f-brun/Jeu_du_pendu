@@ -1,202 +1,181 @@
 package fr.jeux.pendu;
 
 
-import com.badlogic.gdx.ApplicationAdapter;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Scaling;
 
-import android.content.res.Configuration;
+import fr.jeux.pendu.screens.* ;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+public class Pendu extends Game {
 
-public class Pendu extends ApplicationAdapter {
+    public static boolean DEBUG = false ;
+    public static final int TAILLE_BUFFER = 256*1024 ;   //Taille du buffer de lecture du dictionnaire
+    public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
+    public static final String POLICE_MOTS = "Consolas.fnt" ;
+    public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
+    public static int largeurEcran ;
+    public static int hauteurEcran ;
+    public static BitmapFont policeMots ;
+    public static Label.LabelStyle styleMots ;
 
-    public Config cfg;
-
-    protected TextButton boutton;
-    protected Label titre;
-    protected Image imageTitre;
-
-    SpriteBatch batch;
-    Texture img;
-    Partie partie;
-
-    @Override
-    public void create() {
-        cfg = new Config();
-
-        cfg.tMenu = new Table();
-        cfg.tMenu.setFillParent(true);  //La table occupe tout l'écran
-        cfg.stage.addActor(cfg.tMenu);
-
-        if (cfg.DEBUG) cfg.tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
-
-        boutton = new TextButton("Jouer", cfg.skin);
-        titre = new Label("Jeu du pendu\n", cfg.skin);
-        titre.setFontScale(3);	//Augmente la taille de la police
-        img = new Texture("images/pendu11.png");
-        imageTitre = new Image(img);
-
-        cfg.tMenu.pad(3);
-        cfg.tMenu.add(titre);
-        cfg.tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        cfg.tMenu.add(boutton);
-        cfg.tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        cfg.tMenu.add(imageTitre);
-
-                try {   //On attend 0,5 s pour que le mot complet ai le temps de s'afficher
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-        
+    //Références aux différents écrans
+    public static EcranJeu ecranJeu ;
+    public static EcranAccueil ecranAccueil ;
+    public static EcranGagne ecranGagne ;
+    public static EcranPerdu ecranPerdu ;
     
-        boutton.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor acteur) {
-                TextButton boutton;
-                if (acteur instanceof TextButton) {
-                    boutton = (TextButton) acteur;
-                    cfg.partie = new Partie(cfg,1);
-                }
-            }
-        });
-      
-        ChargeImagesPendu();
+    public static Table tPartie ;  //Table contenant la partie
+    public static Table tFin ;  //Table contenant l'écran de fin (gagné ou perdu)
+    public static Skin skin ; //Skin utilisée par l'UI
+    public static final int nbLettresParLigne = 5 ;	//Nombre de bouton lettre par ligne
+    public static Image affichagePendu;  //Elément d'UI contenant l'image du pendu
+    public static String motADeviner ;
+    public static String motDevine ;
+    public static Label lMotDevine; //texte du mot à deviner
+    public static String lettresProposes ;
+    public static int niveau ;		//Niveau de difficulté sélectionné
+    public static int nbErreurs ;	//Nombre de mauvaises lettres proposées
+    public static int nbErreursMax ;	//Nombre de mauvaises lettres proposées
+    public static final int NB_IMAGES = 12 ;
+    public static final String IMAGE_GAGNE = "images/gagne.gif" ;   //Image affichée en cas de victoire
+    public static final String IMAGE_PERDU = "images/perdu.jpg" ;   //Image affichée en cas de défaite
+    public static final float ATTENTE_FIN_PARTIE = 8f ;    //Nombre de secondes où on affiche l'image de fin de partie avant de revenir au menu
+    public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
+    public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
+    public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
+    public static final String FICHIER_DICTIONNAIRE = "liste_filtree.txt" ; //Fichier contenant les mots à deviner
+    public static String[] listeMots ; // Liste des mots à deviner
+    public static int nombreMotsDico ; //Nombre de mots dans le dictionnaire des mots à deviner
+    public static int score ;   //score = nb de mots devinnés d'affilé	
+	
+
+	
+    public void create() {
+        score = 0 ;
+        niveau = 1 ;
+        largeurEcran = Gdx.graphics.getWidth();
+        hauteurEcran = Gdx.graphics.getHeight();
+
+        //Charge et définit les polices et skin d'affichage
+        skin = new Skin(Gdx.files.internal(CHEMIN_SKIN)) ;
+        policeMots = new BitmapFont(Gdx.files.internal(POLICE_MOTS));
+        styleMots = new Label.LabelStyle();
+        styleMots.font = policeMots ;
+
+        //Au départ aucun écran n'est crée
+        ecranJeu = null ;
+        ecranPerdu = null ;
+//        ecranGagne = null ;
+        
+        //Chargement des éléments en mémoire
+        ChargeImagesPendu();		//Les images de la pendaison progressive
         try {
-            RempliListeMot(cfg.FICHIER_DICTIONNAIRE);
+        	RempliListeMot(FICHIER_DICTIONNAIRE);		//Et les mots de la liste
         } catch (FileNotFoundException e) {
-            System.out.println("catch #1 :" + e.toString());
+        	System.out.println("catch #1 :" + e.toString());
         }
-/*        try {
-            EcritListeMots() ;
-        }
-        catch (Exception e) {
-        }*/
+        
+        this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
 
     void ChargeImagesPendu() {
-        int i;	//Compteur d'image indice de tableau
-        for (i = 0; i < cfg.NB_IMAGES; i++) {
-            if (i < 10) {
-                cfg.imagePendu[i] = new Texture(Gdx.files.internal(cfg.CHEMIN_FICHIERS + cfg.PREFIXE_FICHIERS_IMAGES + "0" + i + ".png"));
-            }
-            if (i > 9) {
-                cfg.imagePendu[i] = new Texture(Gdx.files.internal(cfg.CHEMIN_FICHIERS + cfg.PREFIXE_FICHIERS_IMAGES + i + ".png"));
-            }
-        }
+    	int i;	//Compteur d'image indice de tableau
+    	for (i = 0; i < NB_IMAGES; i++) {
+	        if (i < 10) {
+	            imagePendu[i] = new Texture(Gdx.files.internal(CHEMIN_FICHIERS + PREFIXE_FICHIERS_IMAGES + "0" + i + ".png"));
+	        }
+	        if (i > 9) {
+	            imagePendu[i] = new Texture(Gdx.files.internal(CHEMIN_FICHIERS + PREFIXE_FICHIERS_IMAGES + i + ".png"));
+	        }
+    	}
     }
 
-    void RempliListeMot(String fichier) throws FileNotFoundException {
-        boolean finLecture ;
-        String ligne;
-        cfg.nombreMotsDico = 0;
-        BufferedReader reader = null;
-        FileHandle handle ;
-        boolean test ;
-        test = Gdx.files.internal(fichier).exists() ;
-        handle = Gdx.files.internal(fichier) ;
-        if (handle!=null) {
-            ligne = handle.readString();
-        }
-        try {
-            System.out.println("Debut lecture dico");
-            Gdx.app.log("INFO", "Debut lecture dico");
-             	
-        	reader = new BufferedReader(Gdx.files.internal(fichier).reader(),cfg.TAILLE_BUFFER);
-            
-            if (cfg.DEBUG) {
-                System.out.println("Lecture de la première ligne pour obtenir le nombre de mots ...");
-            }
-            cfg.nombreMotsDico = Integer.parseInt(reader.readLine());	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
-            if (cfg.DEBUG) {
-                System.out.println("Il y a "+cfg.nombreMotsDico+" mots. Création du tableau pour les stocker...");
-            }
-        } catch (Exception e) {
-            reader = null ;
-        }
+	void RempliListeMot(String fichier) throws FileNotFoundException {
+	    boolean finLecture ;
+	    String ligne;
+	    nombreMotsDico = 0;
+	    BufferedReader reader = null;
+	    FileHandle handle ;
+	    handle = Gdx.files.internal(fichier) ;
+	    if (handle!=null) {
+	        ligne = handle.readString();
+	    }
+	    try {
+	        System.out.println("Debut lecture dico");
+	        Gdx.app.log("INFO", "Debut lecture dico");
+	         	
+	    	reader = new BufferedReader(Gdx.files.internal(fichier).reader(),TAILLE_BUFFER);
+	        
+	        if (DEBUG) {
+	            System.out.println("Lecture de la première ligne pour obtenir le nombre de mots ...");
+	        }
+	        nombreMotsDico = Integer.parseInt(reader.readLine());	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
+	        if (DEBUG) {
+	            System.out.println("Il y a "+nombreMotsDico+" mots. Création du tableau pour les stocker...");
+	        }
+	    } catch (Exception e) {
+	        reader = null ;
+	    }
+	
+	    listeMots = new String[nombreMotsDico] ;		//Allocation du tableau pour stocker les mots
+	    finLecture = false ;
+	    int i = 0 ;
+	    while (!finLecture && (i < nombreMotsDico)) {
+	        ligne = null;
+	        try {
+	            ligne = reader.readLine();
+	            //                 ligne = Normalizer.normalize(ligne, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", ""); //Retire les accents
+	        } catch (Exception e) {
+	            finLecture = true ;
+	        }
+	        if (ligne == null) {
+	            finLecture = true ;
+	            if (DEBUG) {
+	                System.out.println("Fin de fichier !");
+	            }
+	        } else {
+	        	listeMots[i++] = ligne;
+	        }
+	    }
+	}
+   
+    
+    public void render () {
+		super.render();
+	}
 
-        cfg.listeMots = new String[cfg.nombreMotsDico] ;		//Allocation du tableau pour stocker les mots
-        finLecture = false ;
-        int i = 0 ;
-        while (!finLecture && (i < cfg.nombreMotsDico)) {
-            ligne = null;
-            try {
-                ligne = reader.readLine();
-                //                 ligne = Normalizer.normalize(ligne, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", ""); //Retire les accents
-            } catch (Exception e) {
-                finLecture = true ;
-            }
-            if (ligne == null) {
-                finLecture = true ;
-                if (cfg.DEBUG) {
-                    System.out.println("Fin de fichier !");
-                }
-            } else {
-            	cfg.listeMots[i++] = ligne;
-            }
-        }
-    }
-
-/*    void EcritListeMots() throws IOException {
-        FileWriter f = new FileWriter("D:/Dictionnaire.txt") ;
-        try {
-            for (int i = 0 ; i<cfg.listeMots.size();i++) {
-                f.write(cfg.listeMots.get(i)+"\n");
-            }
-            f.flush();
-            f.close();
-            System.out.println("fichier dico cree sans pb");
-        }
-        catch (Exception e) {
-            System.out.println("Erreur écriture fichier !");
-            }
-        
-        
-            
-        }
-*/         
-       
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0.3f, 0.3f, 0.8f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        cfg.stage.act(Gdx.graphics.getDeltaTime());
-        cfg.stage.draw();
-    }
-
-    public void resize(int width, int height) {
-    	cfg.hauteurEcran = height ;
-    	cfg.largeurEcran = width ;
-        cfg.stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void dispose() {
-//        batch.dispose();
-        img.dispose();
-    }
+    public int getLargeurEcran() { 	return largeurEcran ; }
+    public int getHauteurEcran() { 	return hauteurEcran ; }
+    public boolean getDebugState() {  return DEBUG ; }
+    public Skin getSkin() { return skin ; }
+    public Texture[] getImagesPendu() { return imagePendu ; }
+    public int getNbLettresParLigne() {return nbLettresParLigne ; }
+    public EcranAccueil getEcranAccueil() { return ecranAccueil ; }
+    public EcranJeu getEcranJeu() { return ecranJeu ; }
+    public static EcranGagne getEcranGagne() { return ecranGagne ; }
+    public EcranPerdu getEcranPerdu() { return ecranPerdu ; }
+    public int getScore() { return score; }
+    public int getNiveau() { return niveau ; }
+    
+    public void setLargeurEcran(int l) { largeurEcran = l ; }
+    public void setHauteurEcran(int h) { hauteurEcran = h ; }
+    public void setEcranAccueil(EcranAccueil e) { ecranAccueil = e ; }
+    public void setEcranJeu(EcranJeu e) { ecranJeu = e ; }
+    public static void setEcranGagne(EcranGagne e) { ecranGagne = e ; }
+    public void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
+    public void setScore(int s) { score = s ; }
+    public void setNiveau(int n) { niveau = n ; }
+    
+	public void dispose () {
+	}
 }
