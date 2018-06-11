@@ -1,12 +1,8 @@
 package fr.jeux.pendu;
 
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,8 +14,7 @@ import fr.jeux.pendu.screens.* ;
 
 public class Pendu extends Game {
 
-    public static boolean DEBUG = true ;
-    public static final int TAILLE_BUFFER = 256*1024 ;   //Taille du buffer de lecture du dictionnaire
+    public static boolean DEBUG = false ;
     public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
     public static final String POLICE_MOTS = "Consolas.fnt" ;
     public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
@@ -35,6 +30,7 @@ public class Pendu extends Game {
     //Références aux différents écrans
     public static EcranJeu ecranJeu ;
     public static EcranAccueil ecranAccueil ;
+    public static EcranReglages ecranReglages ;
     public static EcranGagne ecranGagne ;
     public static EcranPerdu ecranPerdu ;
     
@@ -57,9 +53,11 @@ public class Pendu extends Game {
     public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
     public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
-    public static final String FICHIER_DICTIONNAIRE = "liste_filtree.txt" ; //Fichier contenant les mots à deviner
-    public static String[] listeMots ; // Liste des mots à deviner
-    public static int nombreMotsDico ; //Nombre de mots dans le dictionnaire des mots à deviner
+    public static final String FICHIER_DICTIONNAIRE = "Dictionnaires/Français.txt" ; //Fichier contenant les mots à deviner
+    public static final String[][]	listeDictionnaires =	{ { "Francais", "Dictionnaire francais", "Dictionnaires/Francais.txt"},
+    														  { "English", "English dictionary", "Dictionnaires/English.txt"} };
+    
+    public static Dictionnaire	dictionnaire ;	//Dictionnaire en cours
     public static int score ;   //score = nb de mots devinnés d'affilé	
 	
 
@@ -83,11 +81,7 @@ public class Pendu extends Game {
         
         //Chargement des éléments en mémoire
         ChargeImagesPendu();		//Les images de la pendaison progressive
-        try {
-        	RempliListeMot(FICHIER_DICTIONNAIRE);		//Et les mots de la liste
-        } catch (FileNotFoundException e) {
-        	System.out.println("catch #1 :" + e.toString());
-        }
+        dictionnaire = new Dictionnaire(FICHIER_DICTIONNAIRE);		//Initialisation du dictionnaire
         
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
@@ -104,55 +98,6 @@ public class Pendu extends Game {
     	}
     }
 
-	void RempliListeMot(String fichier) throws FileNotFoundException {
-	    boolean finLecture ;
-	    String ligne;
-	    nombreMotsDico = 0;
-	    BufferedReader reader = null;
-	    FileHandle handle ;
-	    handle = Gdx.files.internal(fichier) ;
-	    if (handle!=null) {
-	        ligne = handle.readString();
-	    }
-	    try {
-	        Gdx.app.log("INFO", "Debut lecture dico");
-	         	
-	    	reader = new BufferedReader(Gdx.files.internal(fichier).reader(),TAILLE_BUFFER);
-	        
-	        if (DEBUG) {
-	            System.out.println("Lecture de la première ligne pour obtenir le nombre de mots ...");
-	        }
-	        nombreMotsDico = Integer.parseInt(reader.readLine());	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
-	        if (DEBUG) {
-	            System.out.println("Il y a "+nombreMotsDico+" mots. Création du tableau pour les stocker...");
-	        }
-	    } catch (Exception e) {
-	        reader = null ;
-	    }
-	
-	    listeMots = new String[nombreMotsDico] ;		//Allocation du tableau pour stocker les mots
-	    finLecture = false ;
-	    int i = 0 ;
-	    while (!finLecture && (i < nombreMotsDico)) {
-	        ligne = null;
-	        try {
-	            ligne = reader.readLine();
-	            //                 ligne = Normalizer.normalize(ligne, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", ""); //Retire les accents
-	        } catch (Exception e) {
-	            finLecture = true ;
-	        }
-	        if (ligne == null) {
-	            finLecture = true ;
-	            if (DEBUG) {
-	                System.out.println("Fin de fichier !");
-	            }
-	        } else {
-	        	listeMots[i++] = ligne;
-	        }
-	    }
-	}
-   
-    
     public void render () {
 		super.render();
 	}
@@ -164,6 +109,7 @@ public class Pendu extends Game {
     public Texture[] getImagesPendu() { return imagePendu ; }
     public int getNbLettresParLigne() {return nbLettresParLigne ; }
     public EcranAccueil getEcranAccueil() { return ecranAccueil ; }
+    public EcranReglages getEcranReglages() { return ecranReglages ; }
     public EcranJeu getEcranJeu() { return ecranJeu ; }
     public static EcranGagne getEcranGagne() { return ecranGagne ; }
     public EcranPerdu getEcranPerdu() { return ecranPerdu ; }
@@ -173,6 +119,7 @@ public class Pendu extends Game {
     public void setLargeurEcran(int l) { largeurEcran = l ; }
     public void setHauteurEcran(int h) { hauteurEcran = h ; }
     public void setEcranAccueil(EcranAccueil e) { ecranAccueil = e ; }
+    public void setEcranReglages(EcranReglages e) { ecranReglages = e ; }
     public void setEcranJeu(EcranJeu e) { ecranJeu = e ; }
     public static void setEcranGagne(EcranGagne e) { ecranGagne = e ; }
     public void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }

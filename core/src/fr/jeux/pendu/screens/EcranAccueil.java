@@ -20,7 +20,7 @@ public class EcranAccueil implements Screen {
     public Stage stage ;
     public Table tMenu ;  //Table contenant le menu
 
-    protected TextButton boutton;
+    protected TextButton boutonJeu, boutonReglages ;
     protected Label titre;
     protected Image imageTitre;
 
@@ -43,26 +43,24 @@ public class EcranAccueil implements Screen {
 
         if (jeu.getDebugState()) tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
 
-        boutton = new TextButton("Jouer", jeu.getSkin());
         titre = new Label("Jeu du pendu\n", jeu.getSkin());
         titre.setFontScale(3);	//Augmente la taille de la police
+        boutonJeu = new TextButton("Jouer", jeu.getSkin());
+        boutonReglages = new TextButton("Reglages", jeu.getSkin());
+        
         img = jeu.getImagesPendu()[jeu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
         imageTitre = new Image(img);
 
         tMenu.pad(3);
         tMenu.add(titre);
         tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        tMenu.add(boutton);
-        tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
+        tMenu.add(boutonJeu);
+        tMenu.row();
+        tMenu.add(boutonReglages);
+        tMenu.row();
         tMenu.add(imageTitre);
 
-                try {   //On attend 0,5 s pour que le mot complet ait le temps de s'afficher
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-        
-    
-        boutton.addListener(new ChangeListener() {
+        boutonJeu.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
                 if (acteur instanceof TextButton) {
                 	if (jeu.getEcranJeu() == null) {
@@ -74,6 +72,20 @@ public class EcranAccueil implements Screen {
                 }
             }
         } ) ;
+        
+        boutonReglages.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor acteur) {
+                if (acteur instanceof TextButton) {
+                	if (jeu.getEcranReglages() == null) {
+                		jeu.setScreen(new EcranReglages(jeu));	//Crée l'écran de jeu
+                	}
+                	else {
+                		jeu.setScreen(jeu.getEcranReglages());	//Bascule sur l'écran de jeu déjà existant
+                	}
+                }
+            }
+        } ) ;
+ 
     }
 
     @Override

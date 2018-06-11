@@ -60,7 +60,7 @@ public class EcranJeu implements Screen {
     void init(Pendu jeu) {
         jeu.nbErreurs = 0;
         jeu.nbErreursMax = (jeu.NB_IMAGES - 1) / jeu.getNiveau();
-        jeu.motADeviner = jeu.listeMots[(int) (Math.random() * jeu.nombreMotsDico)];
+        jeu.motADeviner = jeu.dictionnaire.choisitMotAuHasard();
 //Crée le mot deviné en remplaçant toutes les lettres par des sous-tirets
         jeu.motDevine = "";
         for (int i = 0; i < jeu.motADeviner.length(); i++) {
