@@ -29,22 +29,23 @@ public class GestionnaireDeClics extends ChangeListener {
             bouton = (TextButton) acteur;
             lettreProposee = bouton.getText().toString();
 
-            jeu.lettresProposes += lettreProposee;
+            Pendu.lettresProposes += lettreProposee;
 //            bouton.setDisabled(true);
 
             if (CompleteMotADeviner(lettreProposee)) {
-                jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));
-                if (jeu.motDevine.equals(jeu.motADeviner)) {    //Vérifie si on a gagné
+                Pendu.lMotDevine.setText(SepareParDesEspaces(Pendu.motDevine));
+                if (Pendu.motDevine.equals(Pendu.motADeviner)) {    //Vérifie si on a gagné
 //                    jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));
-                    jeu.ecranJeu.gagne(jeu);
+                    Pendu.ecranJeu.gagne(jeu);
                 }	
             } else {
-                jeu.nbErreurs++;
-                if (jeu.DEBUG) System.out.println("La lettre " + lettreProposee + " n'est pas dans le mot");
-                if (jeu.DEBUG) System.out.println(jeu.nbErreurs + " erreur(s) jusqu'ici");
-                jeu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(jeu.getImagesPendu()[jeu.nbErreurs])));
-                if (jeu.nbErreurs >= jeu.nbErreursMax) {	//On a perdu
-                    jeu.ecranJeu.perdu(jeu);
+                Pendu.nbErreurs++;
+                Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().nbErreursMax - Pendu.getNbErreurs())); ;
+                if (Pendu.DEBUG) System.out.println("La lettre " + lettreProposee + " n'est pas dans le mot");
+                if (Pendu.DEBUG) System.out.println(Pendu.getNbErreurs() + " erreur(s) jusqu'ici");
+                Pendu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(Pendu.getImagesPendu()[Pendu.getNiveau().imagesPendaison[Pendu.getNbErreurs()]])));
+                if (Pendu.getNbErreurs() >= Pendu.getNiveau().nbErreursMax) {	//On a perdu
+                    Pendu.ecranJeu.perdu(jeu);
                 }
             }
             acteur.setVisible(false) ;	//Fait disparaître la lettre

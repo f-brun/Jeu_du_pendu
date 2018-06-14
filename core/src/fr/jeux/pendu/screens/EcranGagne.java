@@ -1,7 +1,5 @@
 package fr.jeux.pendu.screens;
 
-import static fr.jeux.pendu.GestionMots.SepareParDesEspaces;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -17,7 +15,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import fr.jeux.pendu.Pendu;
 
 public class EcranGagne implements Screen {
-    private static Stage stage = null ;
+    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
+    														{   3, 2.5f,   2f, 1.5f,   1f, 0.5f}};
+
+	
+	private static Stage stage = null ;
     private static Table table = null ;  //Table contenant les labels
 
     private static Label lAffichageScore = null ;
@@ -30,7 +32,7 @@ public class EcranGagne implements Screen {
 
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
  
-    	if (jeu.getEcranGagne() == null) jeu.setEcranGagne(this); 	//Ecrit la référence à l'écran que l'on vient de créer
+    	if (Pendu.getEcranGagne() == null) Pendu.setEcranGagne(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
@@ -41,17 +43,16 @@ public class EcranGagne implements Screen {
 
         Gdx.input.setInputProcessor(stage);		//Met le focus sur notre écran
         
-        if (jeu.getDebugState()) {
+        if (Pendu.getDebugState()) {
             System.out.println("Gagné !");
         }
 
         //Crée l'affichage du score
-       	lAffichageScore = new Label("Score : "+ Integer.toString(jeu.getScore()),jeu.getSkin()) ;
-        lAffichageScore.setFontScale(3);
+       	lAffichageScore = new Label("Score : "+ Integer.toString(Pendu.getScore()),Pendu.getSkin()) ;
         
 
         //Crée le label contenant l'image
-       	img = new Texture(jeu.IMAGE_GAGNE);
+       	img = new Texture(Pendu.IMAGE_GAGNE);
        	imageGagne = new Image(img);
 
         table = new Table() ;
@@ -59,7 +60,7 @@ public class EcranGagne implements Screen {
         //Définit la disposition de la table
         table.pad(3) ;
         table.setFillParent(true);  //La table occupe tout l'écran
-        if (jeu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
+        if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
         table.add(lAffichageScore);
         table.row();
         table.add(imageGagne);
@@ -68,10 +69,10 @@ public class EcranGagne implements Screen {
   
         imageGagne.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                if (jeu.getDebugState()) {
-                    System.out.println("Retour au menu");
+                if (Pendu.getDebugState()) {
+                    System.out.println("Nouveau mot");
                 }
-                jeu.ecranJeu.RetourMenu() ;
+        		jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
             }
         });
         
@@ -82,7 +83,7 @@ public class EcranGagne implements Screen {
     }
     
     private void actualiseUI() {
-        lAffichageScore.setText("Score : "+ Integer.toString(jeu.getScore()));
+        lAffichageScore.setText("Score : "+ Integer.toString(Pendu.getScore()));
 
     }
 
@@ -97,13 +98,14 @@ public class EcranGagne implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
-    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
-        stage.getViewport().update(width, height, true);
+    	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+   		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
+    	stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-        Gdx.app.log("EcranGagné","show");
+    	if (Pendu.getDebugState()) Gdx.app.log("EcranGagné","show");
         Gdx.input.setInputProcessor(stage);
         
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage

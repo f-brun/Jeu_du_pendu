@@ -20,8 +20,9 @@ public class Pendu extends Game {
     public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
     public static final int LARGEUR_MIN_BOUTONS_LETTRES = 30 ; //Largeur minimale des boutons représentant les lettres
     public static final int LARGEUR_MAX_BOUTONS_LETTRES = 160 ; //Largeur maximale des boutons représentant les lettres
-    public static final int HAUTEUR_MIN_BOUTONS_LETTRES = 15 ; //Hauteur minimale des boutons représentant les lettres
-    public static final int HAUTEUR_MAX_BOUTONS_LETTRES = 60 ; //Hauteur maximale des boutons représentant les lettres
+    public static final int HAUTEUR_MIN_BOUTONS = 15 ; //Hauteur minimale des boutons
+    public static final int HAUTEUR_MAX_BOUTONS = 60 ; //Hauteur maximale des boutons
+
     public static int largeurEcran ;
     public static int hauteurEcran ;
     public static BitmapFont policeMots ;
@@ -33,6 +34,7 @@ public class Pendu extends Game {
     public static EcranReglages ecranReglages ;
     public static EcranGagne ecranGagne ;
     public static EcranPerdu ecranPerdu ;
+    public static EcranChoixDictionnaire ecranChoixDictionnaire ;
     
     public static Table tPartie ;  //Table contenant la partie
     public static Table tFin ;  //Table contenant l'écran de fin (gagné ou perdu)
@@ -42,10 +44,13 @@ public class Pendu extends Game {
     public static String motADeviner ;
     public static String motDevine ;
     public static Label lMotDevine; //texte du mot à deviner
+    public static Label lNbEssaisRestants ;	//Texte indiquant le nombre d'essais restant au joueur avant de perdre
+    public static Label	lNbMotsDevinnes ;	//Texte indiquant le nombre de mots devinnés d'affilés jusqu'ici
+    public static BarreMinuteur	barreMinuteur ;	//Barre de progression pour le minuteur
     public static String lettresProposes ;
-    public static int niveau ;		//Niveau de difficulté sélectionné
+    public static Niveau niveau ;		//Niveau de difficulté sélectionné
     public static int nbErreurs ;	//Nombre de mauvaises lettres proposées
-    public static int nbErreursMax ;	//Nombre de mauvaises lettres proposées
+    public static int nbMotsDevinnes ;	//Nombre de mots devinnés à la suite dans la partie en cours
     public static final int NB_IMAGES = 12 ;
     public static final String IMAGE_GAGNE = "images/gagne.gif" ;   //Image affichée en cas de victoire
     public static final String IMAGE_PERDU = "images/perdu.jpg" ;   //Image affichée en cas de défaite
@@ -53,21 +58,25 @@ public class Pendu extends Game {
     public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
     public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
-//    public static final String FICHIER_DICTIONNAIRE = "Dictionnaires/Français.txt" ; //Fichier contenant les mots à deviner
     public static final String CHEMIN_FICHIERS_DICTIONNAIRES = "Dictionnaires/" ;	//Chemin vers les fichiers dictionnaires
     public static String[][]	listeDictionnaires ;
-    	
-    /*	{ { "Francais", "Dictionnaire francais", "Dictionnaires/Francais.txt"},
-    														  { "Anglais", "English dictionary", "Dictionnaires/Anglais.txt"} };
-    */
     public static Dictionnaire	dictionnaire ;	//Dictionnaire en cours
-    public static int score ;   //score = nb de mots devinnés d'affilé	
-	
+    public static int score ;   //score
+    public static final Niveau[] niveaux = {
+    	new Niveau("Niveau 1", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
+    	new Niveau("Niveau 2",  true, false, 90f, new float[][] {{0.01f,0f},{10,5,5}}                  		 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
+    	new Niveau("Niveau 3",  true, false, 60f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}    , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
+    	new Niveau("Niveau 4",  true, false, 40f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}	 ,  9, new int[] {0,1,2,3,4,5,6,7,9,11}),
+    	new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}) ,
+    	new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11})    } ;
+    
+    public static final float[] pourcentages = {0.6f, 0.4f, 0.2f, 0f} ;
+    public static final int[]	gains = {10, 6, 4, 1, 0} ;
 
 	
     public void create() {
         score = 0 ;
-        niveau = 1 ;
+        niveau = niveaux[0] ;	//Par défaut on commence au niveau 1
         largeurEcran = Gdx.graphics.getWidth();
         hauteurEcran = Gdx.graphics.getHeight();
 
@@ -76,11 +85,6 @@ public class Pendu extends Game {
         policeMots = new BitmapFont(Gdx.files.internal(POLICE_MOTS));
         styleMots = new Label.LabelStyle();
         styleMots.font = policeMots ;
-
-        //Au départ aucun écran n'est crée
-        ecranJeu = null ;
-        ecranPerdu = null ;
-//        ecranGagne = null ;
         
         //Chargement des éléments en mémoire
         ChargeImagesPendu();		//Les images de la pendaison progressive
@@ -107,29 +111,40 @@ public class Pendu extends Game {
 		super.render();
 	}
 
-    public int getLargeurEcran() { 	return largeurEcran ; }
-    public int getHauteurEcran() { 	return hauteurEcran ; }
-    public boolean getDebugState() {  return DEBUG ; }
-    public Skin getSkin() { return skin ; }
-    public Texture[] getImagesPendu() { return imagePendu ; }
-    public int getNbLettresParLigne() {return nbLettresParLigne ; }
-    public EcranAccueil getEcranAccueil() { return ecranAccueil ; }
-    public EcranReglages getEcranReglages() { return ecranReglages ; }
-    public EcranJeu getEcranJeu() { return ecranJeu ; }
+    public static int getLargeurEcran() { 	return largeurEcran ; }
+    public static int getHauteurEcran() { 	return hauteurEcran ; }
+    public static boolean getDebugState() {  return DEBUG ; }
+    public static Skin getSkin() { return skin ; }
+    public static Texture[] getImagesPendu() { return imagePendu ; }
+    public static int getNbLettresParLigne() {return nbLettresParLigne ; }
+    public static EcranAccueil getEcranAccueil() { return ecranAccueil ; }
+    public static EcranReglages getEcranReglages() { return ecranReglages ; }
+    public static EcranChoixDictionnaire getEcranChoixDictionnaire() { return ecranChoixDictionnaire ; }
+    public static EcranJeu getEcranJeu() { return ecranJeu ; }
     public static EcranGagne getEcranGagne() { return ecranGagne ; }
-    public EcranPerdu getEcranPerdu() { return ecranPerdu ; }
-    public int getScore() { return score; }
-    public int getNiveau() { return niveau ; }
+    public static EcranPerdu getEcranPerdu() { return ecranPerdu ; }
+    public static int getScore() { return score; }
+    public static int getNbErreurs() { return nbErreurs ; } ;
+    public static Niveau getNiveau() { return niveau ; }
+
+    public float getTaillePoliceTitreAdaptee(float contrainte,float tabTaillesAdaptees[][]) {
+    	int i ;
+    	for (i = 0 ; i < tabTaillesAdaptees[0].length ; i++) {
+    		if (contrainte >= tabTaillesAdaptees[0][i]) break ;
+    	}
+    	return tabTaillesAdaptees[1][i] ;
+    }
     
     public void setLargeurEcran(int l) { largeurEcran = l ; }
     public void setHauteurEcran(int h) { hauteurEcran = h ; }
     public void setEcranAccueil(EcranAccueil e) { ecranAccueil = e ; }
     public void setEcranReglages(EcranReglages e) { ecranReglages = e ; }
+    public void setEcranChoixDictionnaire(EcranChoixDictionnaire e) { ecranChoixDictionnaire = e ; }
     public void setEcranJeu(EcranJeu e) { ecranJeu = e ; }
     public static void setEcranGagne(EcranGagne e) { ecranGagne = e ; }
     public void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
     public void setScore(int s) { score = s ; }
-    public void setNiveau(int n) { niveau = n ; }
+    public void setNiveau(Niveau n) { niveau = n ; }
     
 	public void dispose () {
 	}

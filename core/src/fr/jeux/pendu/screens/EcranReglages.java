@@ -3,28 +3,32 @@ package fr.jeux.pendu.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import fr.jeux.pendu.Dictionnaire;
 import fr.jeux.pendu.Pendu;
 
 public class EcranReglages implements Screen {
+
+    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
+															{   3,   2f, 1.5f,   1f, 0.9f, 0.5f}};
+
     public Stage stage ;
     public Table table ;  //Table contenant les choix
 
-    private TextButton[] boutonLangue ;
-    private TextButton boutonRetour;
+    private List<String> listeNiveaux ;
+    private String[] intitulesNiveaux ;
+    private TextButton boutonDictionnaire, boutonRetour;
     private Label titre, langueChoisie;
-    public ChangeListener	listenerLangues ;
+    private Cell<Label>	celluleLangueChoisie ;
     
     Pendu jeu ;	//référence aux données du jeu
 	
@@ -41,51 +45,63 @@ public class EcranReglages implements Screen {
         table.setFillParent(true);  //La table occupe tout l'écran
         stage.addActor(table);
 
-        if (jeu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
+        if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
 
-        titre = new Label("Reglages\n", jeu.getSkin());
+        titre = new Label("Reglages\n", Pendu.getSkin());
         titre.setFontScale(3);	//Augmente la taille de la police
         table.pad(3);
         table.add(titre);
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
 
-        boutonLangue = new TextButton[jeu.listeDictionnaires.length] ;
-
-        //Prépare le listener des boutons langue
-        listenerLangues = new ChangeListener() {
-            public void changed(ChangeEvent event, Actor acteur) {
-                if (acteur instanceof TextButton) {
-                	int index ;
-                	//On récupère l'index à partir du début de la chaîne du nom du bouton
-                	index = Integer.parseInt(((TextButton)acteur).getText().toString().substring(1,((TextButton)acteur).getText().toString().indexOf("-")-1)) ;
-                	jeu.dictionnaire = new Dictionnaire(jeu.listeDictionnaires[index-1][2]) ; //Et on charge le dictionnaire correspondant
-                	langueChoisie.setText("\nLangue en cours : "+jeu.dictionnaire.getLangue());
-                }
-            }
-        } ;
-
-        
-        for (int i = 0 ; i < jeu.listeDictionnaires.length ; i++) {
-        	boutonLangue[i] = new TextButton(" "+(i+1)+" - "+jeu.listeDictionnaires[i][0]+ " ("+jeu.listeDictionnaires[i][1]+" mots) ",jeu.getSkin());
-        	boutonLangue[i].addListener(listenerLangues) ;
-            table.add(boutonLangue[i]) ;	//Ajoute le bouton à l'UI
-            table.row();					//Et passe à la ligne suivante
+    	//Crée la liste de sélection du niveau de difficulté
+        listeNiveaux = new List<String>(Pendu.getSkin()) ;
+        intitulesNiveaux = new String[Pendu.niveaux.length] ;
+        for (int i = 0 ; i < Pendu.niveaux.length ; i++) {
+        	intitulesNiveaux[i] = Pendu.niveaux[i].denomination ;
         }
+        listeNiveaux.setItems(intitulesNiveaux) ;
+        
+     //Prépare le listener des boutons langue
+        listeNiveaux.addListener( new ChangeListener() {
+        	public void changed(ChangeEvent event, Actor acteur) {
+                List<String> liste = (List<String>) acteur ;
+               	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau sélectionné, on prend le premier de la liste
+               	Pendu.niveau = Pendu.niveaux[liste.getSelectedIndex()];
+            }
+        } );
 
-        boutonRetour = new TextButton("Retour", jeu.getSkin());
-        langueChoisie = new Label("\nLangue en cours : "+jeu.dictionnaire.getLangue(), jeu.getSkin()) ;
-
-        table.add(boutonRetour) ;
-        table.row();
-        table.add(langueChoisie) ;
-    
-        boutonRetour.addListener(new ChangeListener() {
+        table.row() ;
+        table.add(listeNiveaux) ;
+        
+        boutonDictionnaire = new TextButton("Choix dictionnaire",Pendu.getSkin()) ;
+        boutonDictionnaire.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-                if (acteur instanceof TextButton) {
-               		jeu.setScreen(jeu.getEcranAccueil());	//Retourne sur l'écran d'accueil
+                if (Pendu.getEcranChoixDictionnaire() == null) {
+                	jeu.setScreen(new EcranChoixDictionnaire(jeu));	//crée l'écran de choix du dcitonnaire s'il n'existe pas
                 }
+                else jeu.setScreen(Pendu.getEcranChoixDictionnaire());	//Retourne sur l'écran d'accueil
             }
         } ) ;
+       table.row() ;
+        table.add(boutonDictionnaire).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
+
+        
+        boutonRetour = new TextButton("Retour", Pendu.getSkin());
+        boutonRetour.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor acteur) {
+          		jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'écran d'accueil
+            }
+        } ) ;
+        table.row() ;
+        table.add(boutonRetour).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
+        
+        langueChoisie = new Label("\nLangue en cours : "+Pendu.dictionnaire.getLangue(), Pendu.getSkin()) ;
+        langueChoisie.setWrap(true); //Autorise le passage à la ligne si le texte est trop grand
+        langueChoisie.setAlignment(Align.center); //Centre le texte dans la boite
+
+        table.row() ;
+        celluleLangueChoisie = table.add(langueChoisie).align(Align.center).width(Pendu.getLargeurEcran()) ;
+    
         
     }
 
@@ -100,15 +116,19 @@ public class EcranReglages implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
-    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+    	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+   		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
+        celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte précisant la langue choisie
+
         stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-        Gdx.app.log("EcranRéglages","show");
+        if (Pendu.getDebugState()) Gdx.app.log("EcranRéglages","show");
         Gdx.input.setInputProcessor(stage);
-
+        listeNiveaux.setSelectedIndex(Pendu.getNiveau().numero); 	//On se positionne sur le niveau actuel
+        langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaire.getLangue()) ;
     }
 
     @Override

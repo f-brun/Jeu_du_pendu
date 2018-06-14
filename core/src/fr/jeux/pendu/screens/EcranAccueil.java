@@ -16,6 +16,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import fr.jeux.pendu.Pendu ;
 
 public class EcranAccueil implements Screen {
+	
+    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600, 400,  300,  200,  100,    0},
+															 {  3,   2, 1.5f,   1f, 0.5f, 0.3f}};
 
     public Stage stage ;
     public Table tMenu ;  //Table contenant le menu
@@ -41,46 +44,47 @@ public class EcranAccueil implements Screen {
         tMenu.setFillParent(true);  //La table occupe tout l'écran
         stage.addActor(tMenu);
 
-        if (jeu.getDebugState()) tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
+        if (Pendu.getDebugState()) tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
 
-        titre = new Label("Jeu du pendu\n", jeu.getSkin());
-        titre.setFontScale(3);	//Augmente la taille de la police
-        boutonJeu = new TextButton("Jouer", jeu.getSkin());
-        boutonReglages = new TextButton("Reglages", jeu.getSkin());
+        titre = new Label("Jeu du pendu\n", Pendu.getSkin());
+        boutonJeu = new TextButton("Jouer", Pendu.getSkin());
+        boutonReglages = new TextButton("Reglages", Pendu.getSkin());
         
-        img = jeu.getImagesPendu()[jeu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
+        img = Pendu.getImagesPendu()[Pendu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
         imageTitre = new Image(img);
 
         tMenu.pad(3);
         tMenu.add(titre);
         tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        tMenu.add(boutonJeu);
+        tMenu.add(boutonJeu).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
-        tMenu.add(boutonReglages);
+        tMenu.add(boutonReglages).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
         tMenu.add(imageTitre);
 
         boutonJeu.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-                if (acteur instanceof TextButton) {
-                	if (jeu.getEcranJeu() == null) {
-                		jeu.setScreen(new EcranJeu(jeu,1));	//Crée l'écran de jeu
-                	}
-                	else {
-                		jeu.setScreen(jeu.getEcranJeu());	//Bascule sur l'écran de jeu déjà existant
-                	}
-                }
+            	if (Pendu.getDebugState()) Gdx.app.log("INFO","raz du nb de mots devinnés");
+            	Pendu.nbMotsDevinnes = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
+            	if (Pendu.lNbMotsDevinnes != null) Pendu.lNbMotsDevinnes.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevinnes);
+
+            	if (Pendu.getEcranJeu() == null) {
+               		jeu.setScreen(new EcranJeu(jeu));	//Crée l'écran de jeu
+               	}
+               	else {
+               		jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu déjà existant
+               	}
             }
         } ) ;
         
         boutonReglages.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
                 if (acteur instanceof TextButton) {
-                	if (jeu.getEcranReglages() == null) {
+                	if (Pendu.getEcranReglages() == null) {
                 		jeu.setScreen(new EcranReglages(jeu));	//Crée l'écran de jeu
                 	}
                 	else {
-                		jeu.setScreen(jeu.getEcranReglages());	//Bascule sur l'écran de jeu déjà existant
+                		jeu.setScreen(Pendu.getEcranReglages());	//Bascule sur l'écran de jeu déjà existant
                 	}
                 }
             }
@@ -99,13 +103,14 @@ public class EcranAccueil implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
-    	if (jeu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
+    	titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
         stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-        Gdx.app.log("EcranAccueil","show");
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranAccueil - show");
         Gdx.input.setInputProcessor(stage);
 
     }

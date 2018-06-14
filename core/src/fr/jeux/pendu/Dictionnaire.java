@@ -1,14 +1,12 @@
 package fr.jeux.pendu;
 
 import java.io.BufferedReader;
-import java.io.File;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 public class Dictionnaire {
 
-	static final boolean	DEBUG = true ;
+	static final boolean	DEBUG = false ;
 	String	langue ;
 	int		nbMots ;
 	String[]	Mots ;
@@ -21,17 +19,17 @@ public class Dictionnaire {
 	    nbMots = 0;
 	    
 	    try {
-	        Gdx.app.log("INFO", "Debut lecture dico - "+fichier);
+	    	if (DEBUG) Gdx.app.log("INFO", "Debut lecture dico - "+fichier);
 	         	
 	    	reader = new BufferedReader(Gdx.files.internal(fichier).reader());
 
-	        if (DEBUG) System.out.println("Lecture de la première ligne pour obtenir le nom du dico ...") ;
+	        if (DEBUG) Gdx.app.log("INFO", "Lecture de la première ligne pour obtenir le nom du dico ...") ;
 	        langue = reader.readLine();	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
 
-	        if (DEBUG) System.out.println("Lecture de la deuxième ligne pour obtenir le nombre de mots ...") ;
+	        if (DEBUG) Gdx.app.log("INFO","Lecture de la deuxième ligne pour obtenir le nombre de mots ...") ;
 	        nbMots = Integer.parseInt(reader.readLine());	//Récupère le nombre de mots à lire (la première ligne du fichier contient le nombre de mots)
 
-	        if (DEBUG) System.out.println("Il y a "+nbMots+" mots. Création du tableau pour les stocker...") ;
+	        if (DEBUG) Gdx.app.log("INFO","Il y a "+nbMots+" mots. Création du tableau pour les stocker...") ;
 	        
 	    } catch (Exception e) {
 	        reader = null ;
@@ -51,9 +49,7 @@ public class Dictionnaire {
 	        }
 	        if (ligne == null) {
 	            finLecture = true ;
-	            if (DEBUG) {
-	                System.out.println("Fin de fichier !");
-	            }
+	            if (DEBUG) Gdx.app.log("INFO","Fin de fichier !");
 	        } else {
 	        	Mots[i++] = ligne;
 	        }
@@ -65,6 +61,7 @@ public class Dictionnaire {
 	}
 	
 	public String getLangue() { return langue ; } ;
+	public int getNbMots() { return nbMots ; } ;
 	
 	public static String[][] getListeDictionnaires(String cheminDictionnaires) {
 		FileHandle[]	listeRepertoire ;
@@ -74,7 +71,7 @@ public class Dictionnaire {
 
 		
 		listeRepertoire = Gdx.files.internal(cheminDictionnaires).list() ;
-		if (DEBUG) 	Gdx.app.log("Liste dictionnaire", listeRepertoire.length + " dictionnaires trouvés");
+		if (DEBUG) 	Gdx.app.log("INFO", listeRepertoire.length + " dictionnaires trouvés");
 		listeDictionnaires = new String[listeRepertoire.length][3] ;
 		for (int i = 0 ; i < listeRepertoire.length ; i++) {
 			fichier = listeRepertoire[i].toString() ;
@@ -83,11 +80,11 @@ public class Dictionnaire {
 				listeDictionnaires[i][0] = reader.readLine() ;	//Lit le nom du dictionnaire
 				listeDictionnaires[i][1] = reader.readLine() ;	//Lit le nombre de mots
 				listeDictionnaires[i][2] = fichier;				//Stocke le chemin d'accès
-				if (DEBUG) 	Gdx.app.log("Liste dictionnaire", "Dictionnaire trouvé : "+listeDictionnaires[i][0]+" avec "+listeDictionnaires[i][1]+" mots");
+				if (DEBUG) 	Gdx.app.log("INFO", "Dictionnaire trouvé : "+listeDictionnaires[i][0]+" avec "+listeDictionnaires[i][1]+" mots");
 				reader.close();
 			} catch (Exception e) {
 		        reader = null ;
-		        Gdx.app.log("BUG", "Erreur dans la lecture du fichier de dictionnaire "+fichier);
+		        Gdx.app.log("ERROR", "Erreur dans la lecture du fichier de dictionnaire "+fichier);
 			}
 		}
 		
