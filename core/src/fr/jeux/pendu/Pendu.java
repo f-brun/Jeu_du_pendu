@@ -145,7 +145,23 @@ public class Pendu extends Game {
     public void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
     public void setScore(int s) { score = s ; }
     public void setNiveau(Niveau n) { niveau = n ; }
-    
+
+
+    public void pause() {
+        barreMinuteur.pause() ;
+    }
+
+    public void resume() {
+        barreMinuteur.resume() ;
+    }
+
+
 	public void dispose () {
+        ecranAccueil = null ;
+        ecranChoixDictionnaire = null ;
+        ecranGagne = null ;
+        ecranJeu = null ;
+        ecranPerdu = null ;
+        ecranReglages = null ;
 	}
 }

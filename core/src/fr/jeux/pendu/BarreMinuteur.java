@@ -12,16 +12,18 @@ public class BarreMinuteur extends ProgressBar {
 	private static final Color couleurVert = Color.GREEN ;
 	private long tempsDebut ;
 	private long tempsFin ;
-	private long tempsPause ;
+	private long tempsPause ;	//Heure de debut de la pause
+	private long dureePause ;	//Duree de la pause
 	
 	private float duree ;
 	private float	pourcentRouge, pourcentOrange, pourcentJaune ;
-	private boolean running ;
+	private boolean running ;	//Indique que le chrono tourne
+	private boolean enPause ;	//Indique que le chrono est sur pause
 	
 	public BarreMinuteur(float dureeMinuteur, float R, float O, float J, boolean vertical,Skin skin) {
 		super(0,dureeMinuteur,0.1f,vertical,skin) ;
 		super.setRound(false);
-		tempsDebut = tempsFin = tempsPause = 0 ;
+		tempsDebut = tempsFin = tempsPause = dureePause = 0 ;
 		pourcentRouge = R ;
 		pourcentOrange = O ;
 		pourcentJaune = J ;
@@ -31,45 +33,67 @@ public class BarreMinuteur extends ProgressBar {
 	}
 	
 	public void depart() {
-		tempsDebut = System.currentTimeMillis() ;
-		tempsFin = tempsPause = 0 ;
-		running = true ;
-		this.setValue(duree) ;	//On part avec une jauge pleine
-		this.miseAJour() ;
+		if (!running) {
+			tempsDebut = System.currentTimeMillis() ;
+			tempsFin = tempsPause = dureePause = 0 ;
+			running = true ;
+			this.setValue(duree) ;	//On part avec une jauge pleine
+			this.miseAJour() ;
+		}
 	}
 	
 	public float stop() {
 		tempsFin = System.currentTimeMillis() ;
 		running = false ;
 		this.miseAJour() ;
-		float ecoule = (tempsFin - tempsDebut)/1000 ;
-		if (ecoule > duree) return 0 ;		//Si le temps est écoulé on retourne 0
-		return (duree - ecoule)/duree ;		//Sinon on retourne la fraction de la durée du minuteur qui s'est écoulé
+		float ecoule = (tempsFin - tempsDebut - dureePause)/1000 ;
+		if (ecoule > duree) return 0 ;		//Si le temps est ï¿½coulï¿½ on retourne 0
+		return (duree - ecoule)/duree ;		//Sinon on retourne la fraction de la durï¿½e du minuteur qui s'est ï¿½coulï¿½
 	}
-	
+
+	public void pause() {
+		if (running && !enPause) {
+			tempsPause = System.currentTimeMillis() ;
+			running = false ;
+			enPause = true ;
+			this.miseAJour() ;
+		}
+	}
+
+	public void resume() {
+		if (!running && enPause) {
+			dureePause += System.currentTimeMillis() - tempsPause ;
+			enPause = false ;
+			running = true ;
+			this.miseAJour() ;
+		}
+	}
+
+
 	public void reset (float duree,float pourcentRouge, float pourcentOrange, float pourcentJaune) {
 		this.duree = duree ;
 		this.pourcentRouge = pourcentRouge ;
 		this.pourcentOrange = pourcentOrange ;
 		this.pourcentJaune = pourcentJaune ;
-    	this.setRange(0, duree);		//Définit les valeurs min et max de la progressbar
+    	this.setRange(0, duree);		//Dï¿½finit les valeurs min et max de la progressbar
 		this.reset();
 	}
 	
 	public void reset() {
 		tempsDebut = tempsFin = tempsPause = 0 ;
+		this.miseAJour() ;
 	}
 
-/** Mise à jour du minuteur. Renvoi le pourcentage du temps restant et met à jour l'affichage en changeant la couleur si nécessaire
+/** Mise ï¿½ jour du minuteur. Renvoi le pourcentage du temps restant et met ï¿½ jour l'affichage en changeant la couleur si nï¿½cessaire
  * 
- * @return pourcentage du temps restant ou 0 si le temps est écoulé
+ * @return pourcentage du temps restant ou 0 si le temps est ï¿½coulï¿½
  */
 	public float miseAJour() {
 		float ecoule ;
 		float pourcentage ;
 		ecoule = (running) ? ((System.currentTimeMillis() - tempsDebut)/1000) : ((tempsFin - tempsDebut)/1000) ;
 		pourcentage = (duree - ecoule)/duree ;	//Pourcentage du temps restant
-		pourcentage = (pourcentage < 0) ? 0 : pourcentage ;	//On met à zéro si le pourcentage est négatif
+		pourcentage = (pourcentage < 0) ? 0 : pourcentage ;	//On met ï¿½ zï¿½ro si le pourcentage est nï¿½gatif
 		if (pourcentage <= pourcentRouge) {
 			this.setColor(couleurRouge);
 		}
@@ -81,7 +105,6 @@ public class BarreMinuteur extends ProgressBar {
 		}
 		else this.setColor(couleurVert);
 		this.setValue(pourcentage*duree) ;	//On actualise la valeur de la progressbar
-		return pourcentage ;	//pourcentage du temps restant ou 0 si le temps est écoulé
+		return pourcentage ;	//pourcentage du temps restant ou 0 si le temps est ï¿½coulï¿½
 	}
-	
 }

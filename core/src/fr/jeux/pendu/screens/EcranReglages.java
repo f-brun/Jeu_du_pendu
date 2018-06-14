@@ -30,19 +30,19 @@ public class EcranReglages implements Screen {
     private Label titre, langueChoisie;
     private Cell<Label>	celluleLangueChoisie ;
     
-    Pendu jeu ;	//référence aux données du jeu
+    Pendu jeu ;	//rï¿½fï¿½rence aux donnï¿½es du jeu
 	
     public EcranReglages(Pendu jeuEnCours) {
-    	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
+    	jeu = jeuEnCours ;	//reprend la rï¿½fï¿½rence au jeu pour toutes les mï¿½thodes de la classe
     	
-    	jeu.setEcranReglages(this) ; 	//Enregistre la référence de cet écran
+    	jeu.setEcranReglages(this) ; 	//Enregistre la rï¿½fï¿½rence de cet ï¿½cran
     	
         stage = new Stage(new ScreenViewport());
 
         Gdx.input.setInputProcessor(stage);
 
         table = new Table();
-        table.setFillParent(true);  //La table occupe tout l'écran
+        table.setFillParent(true);  //La table occupe tout l'ï¿½cran
         stage.addActor(table);
 
         if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
@@ -51,9 +51,9 @@ public class EcranReglages implements Screen {
         titre.setFontScale(3);	//Augmente la taille de la police
         table.pad(3);
         table.add(titre);
-        table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
+        table.row();    //Indique que l'ï¿½lï¿½ment suivant sera sur une ligne supplï¿½mentaire
 
-    	//Crée la liste de sélection du niveau de difficulté
+    	//Crï¿½e la liste de sï¿½lection du niveau de difficultï¿½
         listeNiveaux = new List<String>(Pendu.getSkin()) ;
         intitulesNiveaux = new String[Pendu.niveaux.length] ;
         for (int i = 0 ; i < Pendu.niveaux.length ; i++) {
@@ -61,11 +61,11 @@ public class EcranReglages implements Screen {
         }
         listeNiveaux.setItems(intitulesNiveaux) ;
         
-     //Prépare le listener des boutons langue
+     //Prï¿½pare le listener des boutons langue
         listeNiveaux.addListener( new ChangeListener() {
         	public void changed(ChangeEvent event, Actor acteur) {
                 List<String> liste = (List<String>) acteur ;
-               	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau sélectionné, on prend le premier de la liste
+               	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau sï¿½lectionnï¿½, on prend le premier de la liste
                	Pendu.niveau = Pendu.niveaux[liste.getSelectedIndex()];
             }
         } );
@@ -77,9 +77,9 @@ public class EcranReglages implements Screen {
         boutonDictionnaire.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
                 if (Pendu.getEcranChoixDictionnaire() == null) {
-                	jeu.setScreen(new EcranChoixDictionnaire(jeu));	//crée l'écran de choix du dcitonnaire s'il n'existe pas
+                	jeu.setScreen(new EcranChoixDictionnaire(jeu));	//crï¿½e l'ï¿½cran de choix du dcitonnaire s'il n'existe pas
                 }
-                else jeu.setScreen(Pendu.getEcranChoixDictionnaire());	//Retourne sur l'écran d'accueil
+                else jeu.setScreen(Pendu.getEcranChoixDictionnaire());	//Retourne sur l'ï¿½cran d'accueil
             }
         } ) ;
        table.row() ;
@@ -92,14 +92,14 @@ public class EcranReglages implements Screen {
             	if (Pendu.getEcranAccueil() == null ) {
             		jeu.setEcranAccueil(new EcranAccueil(jeu));
             	}
-            	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'écran d'accueil
+            	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'ï¿½cran d'accueil
             }
         } ) ;
         table.row() ;
         table.add(boutonRetour).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         
         langueChoisie = new Label("\nLangue en cours : "+Pendu.dictionnaire.getLangue(), Pendu.getSkin()) ;
-        langueChoisie.setWrap(true); //Autorise le passage à la ligne si le texte est trop grand
+        langueChoisie.setWrap(true); //Autorise le passage ï¿½ la ligne si le texte est trop grand
         langueChoisie.setAlignment(Align.center); //Centre le texte dans la boite
 
         table.row() ;
@@ -120,15 +120,15 @@ public class EcranReglages implements Screen {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
-   		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
-        celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte précisant la langue choisie
+   		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police ï¿½ la hauteur de l'affichage
+        celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte prï¿½cisant la langue choisie
 
         stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-        if (Pendu.getDebugState()) Gdx.app.log("EcranRéglages","show");
+        if (Pendu.getDebugState()) Gdx.app.log("EcranRï¿½glages","show");
         Gdx.input.setInputProcessor(stage);
         listeNiveaux.setSelectedIndex(Pendu.getNiveau().numero); 	//On se positionne sur le niveau actuel
         langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaire.getLangue()) ;
@@ -151,12 +151,14 @@ public class EcranReglages implements Screen {
 
     
     /**
-     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
-     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     * Elimine les rï¿½fï¿½rences statiques aux objets car si l'application est relancï¿½e juste aprï¿½s ï¿½tre quittï¿½e, toutes les rï¿½fï¿½rences statiques
+     * demeurent alors que les objets (ï¿½cran, widgets... ) sont eux dï¿½truits
      */
     @Override
     public void dispose() {
-    	jeu.setEcranReglages(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+        if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran des reglages") ;
+    	jeu.setEcranReglages(null) ;	//Supprime la rï¿½fï¿½rence ï¿½ l'ï¿½cran pour l'obliger ï¿½ ï¿½tre re-crï¿½e la prochaine fois
+        if (Pendu.DEBUG) Gdx.app.log("INFO","Destruction du stage") ;
     	stage.dispose();
     }
 }
