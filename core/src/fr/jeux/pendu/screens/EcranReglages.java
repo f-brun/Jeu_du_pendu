@@ -89,7 +89,10 @@ public class EcranReglages implements Screen {
         boutonRetour = new TextButton("Retour", Pendu.getSkin());
         boutonRetour.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-          		jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'écran d'accueil
+            	if (Pendu.getEcranAccueil() == null ) {
+            		jeu.setEcranAccueil(new EcranAccueil(jeu));
+            	}
+            	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'écran d'accueil
             }
         } ) ;
         table.row() ;
@@ -147,8 +150,13 @@ public class EcranReglages implements Screen {
     }
 
     
+    /**
+     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     */
     @Override
     public void dispose() {
-        stage.dispose();
+    	jeu.setEcranReglages(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	stage.dispose();
     }
 }

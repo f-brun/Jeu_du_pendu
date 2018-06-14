@@ -87,9 +87,10 @@ package fr.jeux.pendu.screens;
 	    
 	        boutonRetour.addListener(new ChangeListener() {
 	            public void changed(ChangeEvent event, Actor acteur) {
-	                if (acteur instanceof TextButton) {
-	               		jeu.setScreen(Pendu.getEcranReglages());	//Retourne sur l'écran des réglages
+	                if (Pendu.getEcranReglages() == null) {
+	                	jeu.setScreen(new EcranReglages(jeu));
 	                }
+	                else jeu.setScreen(Pendu.getEcranReglages());	//Retourne sur l'écran des réglages
 	            }
 	        } ) ;
 	        
@@ -136,8 +137,13 @@ package fr.jeux.pendu.screens;
 	    }
 
 	    
+	    /**
+	     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+	     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+	     */
 	    @Override
 	    public void dispose() {
-	        stage.dispose();
+	    	jeu.setEcranChoixDictionnaire(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+	    	stage.dispose();
 	    }
 	}

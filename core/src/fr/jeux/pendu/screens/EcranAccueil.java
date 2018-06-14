@@ -79,14 +79,12 @@ public class EcranAccueil implements Screen {
         
         boutonReglages.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-                if (acteur instanceof TextButton) {
-                	if (Pendu.getEcranReglages() == null) {
-                		jeu.setScreen(new EcranReglages(jeu));	//Crée l'écran de jeu
-                	}
-                	else {
-                		jeu.setScreen(Pendu.getEcranReglages());	//Bascule sur l'écran de jeu déjà existant
-                	}
-                }
+               	if (Pendu.getEcranReglages() == null) {
+               		jeu.setScreen(new EcranReglages(jeu));	//Crée l'écran de jeu
+               	}
+               	else {
+               		jeu.setScreen(Pendu.getEcranReglages());	//Bascule sur l'écran de jeu déjà existant
+               	}
             }
         } ) ;
  
@@ -131,9 +129,14 @@ public class EcranAccueil implements Screen {
     }
 
     
+    /**
+     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     */
     @Override
     public void dispose() {
-        img.dispose();
-        stage.dispose();
+    	jeu.setEcranAccueil(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	img.dispose();
+    	stage.dispose();
     }
 }

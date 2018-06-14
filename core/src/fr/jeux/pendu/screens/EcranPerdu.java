@@ -153,9 +153,13 @@ public class EcranPerdu implements Screen {
     }
 
     
+    /**
+     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     */
     @Override
     public void dispose() {
-        img.dispose();
-        stage.dispose();
+    	jeu.setEcranPerdu(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	stage.dispose();
     }
 }

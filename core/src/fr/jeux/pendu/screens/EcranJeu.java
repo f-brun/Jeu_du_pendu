@@ -169,20 +169,20 @@ public class EcranJeu implements Screen {
         
         Pendu.lNbMotsDevinnes.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevinnes);
         
-        //Ici on est obligé de passer par une tâche en parallèle, sinon l'actualisation de l'écran ne se fait pas et on ne pourrais pas voir le mot complété
+        //Ici on est obligé de passer par une tâche en parallèle, sinon l'actualisation de l'écran ne se fait pas et on ne pourrait pas voir le mot complété
         Timer.Task affichageGagne; //Contiendra le code à exécuter pour afficher l'image de fin après un délai
         
         affichageGagne = new Timer.Task(){
         	@Override
         	public void run() {
-        		BasculeVersEcranGagne() ;	//On a aucun accès au jeu, donc on va appeler une méthode statique de cette classe qui elle aura accès aux données du jeu
+        		basculeVersEcranGagne() ;	//On a aucun accès au jeu, donc on va appeler une méthode statique de cette classe qui elle aura accès aux données du jeu
         	}
         } ;
         
         schedule(affichageGagne,jeu.DUREE_AFFICHAGE_GAGNE) ;
     }
 
-    public static void BasculeVersEcranGagne() {
+    public static void basculeVersEcranGagne() {
     	if (Pendu.getEcranGagne() == null) {
             jeu.setScreen(new EcranGagne(jeu));	//Bascule sur l'écran de victoire
     	}
@@ -202,11 +202,34 @@ public class EcranJeu implements Screen {
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.8f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         jeu.barreMinuteur.miseAJour() ;
+
+        if ((jeu.getNiveau().minuteurFaitPerdre) && (jeu.barreMinuteur.getPercent() == 0) ) {	//Si le temps est écoulé et que cela fait perdre
+            Timer.Task perduTempsEcoule ; //Contiendra le code à exécuter pour afficher l'image de fin après un délai
+            
+            perduTempsEcoule = new Timer.Task(){
+            	@Override
+            	public void run() {
+            		basculeVersEcranPerdu() ;	//On a aucun accès au jeu, donc on va appeler une méthode statique de cette classe qui elle aura accès aux données du jeu
+            	}
+            } ;
+            
+            schedule(perduTempsEcoule,0.01f) ;	//On bascule sur perdu dans 10 ms, le temps de finir l'affichage
+        }
         
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }
+    
 
+    public static void basculeVersEcranPerdu() {
+    	jeu.barreMinuteur.stop();
+    	if (jeu.getEcranPerdu() == null) {
+            jeu.setScreen(new EcranPerdu(jeu));		//Bascule sur l'écran de game over
+    	}
+    	else jeu.setScreen(jeu.getEcranPerdu());
+    }
+
+    
     @Override
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
@@ -255,9 +278,18 @@ public class EcranJeu implements Screen {
 
     }
 
-    
+    /**
+     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     */
     @Override
     public void dispose() {
+    	//Elimine dabord les références aux objets de l'écran
+    	Pendu.lMotDevine = Pendu.lNbEssaisRestants = Pendu.lNbMotsDevinnes = null ;
+    	//Puis la référence à l'écran lui-même
+    	jeu.setEcranJeu(null) ;
+    	img.dispose();
+    	stage.dispose();
     }
     
 }

@@ -72,7 +72,10 @@ public class EcranGagne implements Screen {
                 if (Pendu.getDebugState()) {
                     System.out.println("Nouveau mot");
                 }
-        		jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
+                if (jeu.getEcranJeu() == null) {
+                	jeu.setEcranJeu(new EcranJeu(jeu));
+                }
+                else jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
             }
         });
         
@@ -128,9 +131,14 @@ public class EcranGagne implements Screen {
     }
 
     
+    /**
+     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
+     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     */
     @Override
     public void dispose() {
+    	jeu.setEcranGagne(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
         img.dispose();
         stage.dispose();
-    }
+     }
 }
