@@ -12,10 +12,10 @@ public class GestionMots {
        int pos;	//index dans le mot à deviner
        int i = 0;
        do {
-           pos = jeu.motADeviner.indexOf(lettreProposee, i);	//index de la première occurence de la lettre proposée dans le mot à devinner
+           pos = Pendu.motADeviner.indexOf(lettreProposee, i);	//index de la première occurence de la lettre proposée dans le mot à devinner
            if (pos != -1) {
                lettrePresente = true;
-               jeu.motDevine = jeu.motDevine.substring(0, pos) + lettreProposee + jeu.motDevine.substring(pos + 1);
+               Pendu.motDevine = Pendu.motDevine.substring(0, pos) + lettreProposee + Pendu.motDevine.substring(pos + 1);
                i = pos;
            }
            i++;

@@ -103,9 +103,9 @@ public class EcranJeu implements Screen {
 
 
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        tInfos.add(Pendu.lNbMotsDevinnes).maxWidth(jeu.getLargeurEcran()/4).space(5) ;
+        tInfos.add(Pendu.lNbMotsDevinnes).maxWidth(jeu.getLargeurEcran()/4).space(8) ;
         tInfos.add(jeu.affichagePendu).maxWidth(jeu.getLargeurEcran()/2) ; //.align(Align.center) ;
-        tInfos.add(Pendu.lNbEssaisRestants).maxWidth(jeu.getLargeurEcran()/4).space(5) ;
+        tInfos.add(Pendu.lNbEssaisRestants).maxWidth(jeu.getLargeurEcran()/4).space(8) ;
         celluleInfos = table.add(tInfos).width(jeu.getLargeurEcran()) ;	//.align(Align.center)
         
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
@@ -135,6 +135,7 @@ public class EcranJeu implements Screen {
     private void actualiseUI() {
         jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));									//Ré-initialise le texte du mot à deviner
     	jeu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(jeu.getImagesPendu()[0])));	//Remet l'image du pendu sur la première image
+        Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().nbErreursMax - Pendu.getNbErreurs())) ;
     	
     	//Rend tous les acteurs visibles : cela permet de faire en sorte que toutes les lettres choisies précédemment ré-apparaissent
     	@SuppressWarnings("rawtypes")
