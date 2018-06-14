@@ -91,7 +91,7 @@ public class BarreMinuteur extends ProgressBar {
 	public float miseAJour() {
 		float ecoule ;
 		float pourcentage ;
-		ecoule = (running) ? ((System.currentTimeMillis() - tempsDebut)/1000) : ((tempsFin - tempsDebut)/1000) ;
+		ecoule = (running) ? ((System.currentTimeMillis() - tempsDebut - dureePause)/1000) : ((tempsFin - tempsDebut - dureePause)/1000) ;
 		pourcentage = (duree - ecoule)/duree ;	//Pourcentage du temps restant
 		pourcentage = (pourcentage < 0) ? 0 : pourcentage ;	//On met � z�ro si le pourcentage est n�gatif
 		if (pourcentage <= pourcentRouge) {

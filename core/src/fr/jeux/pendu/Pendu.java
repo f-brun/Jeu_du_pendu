@@ -146,17 +146,18 @@ public class Pendu extends Game {
     public void setScore(int s) { score = s ; }
     public void setNiveau(Niveau n) { niveau = n ; }
 
-
     public void pause() {
+        if (DEBUG) Gdx.app.log("INFO","L'appli se met en pause...") ;
         barreMinuteur.pause() ;
     }
 
     public void resume() {
+        if (DEBUG) Gdx.app.log("INFO","L'appli sort de pause...") ;
         barreMinuteur.resume() ;
     }
 
-
 	public void dispose () {
+        if (DEBUG) Gdx.app.log("INFO","Fermeture - Suppression des references aux objets statiques") ;
         ecranAccueil = null ;
         ecranChoixDictionnaire = null ;
         ecranGagne = null ;
