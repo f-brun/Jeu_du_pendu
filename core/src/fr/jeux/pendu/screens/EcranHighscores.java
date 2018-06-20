@@ -150,10 +150,10 @@ public class EcranHighscores implements Screen {
     private void actualiseUI() {
     	Score[] highScore = Pendu.highscore.getMeilleursScores() ;
     	
-    	tScores.columnDefaults(0).width(40);
-    	tScores.columnDefaults(1).width(300);
-    	tScores.columnDefaults(2).width(80);
-    	tScores.columnDefaults(3).width(120);
+    	tScores.columnDefaults(0).minWidth(40);
+    	tScores.columnDefaults(1).minWidth(120) ;
+    	tScores.columnDefaults(2).minWidth(80);
+    	tScores.columnDefaults(3).minWidth(120);
 
     	for (int i = 0 ; i < highScore.length ; i++) {
     		lScores[i][0].setText(Integer.toString(i+1)) ;

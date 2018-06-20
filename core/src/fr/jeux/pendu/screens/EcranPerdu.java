@@ -49,6 +49,7 @@ public class EcranPerdu implements Screen {
     public static Dialog dialogHighscore ;	//Fenetre de dialogue pour informer qu'un highscore vient d'etre realise
 	public static TextField	saisieNom ;	//Textfield pour la saisie du nom du joueur
 	Label		lHighscore ;
+	Cell<Label>	celluleTexteHighscore ;
 
     
     Cell<Label>	celluleTexteATrouver ;
@@ -154,8 +155,8 @@ public class EcranPerdu implements Screen {
    		lTexteATrouver.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
    		if (lHighscore != null)	lHighscore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la largeur de l'affichage
    		if (dialogHighscore != null) {
-   			dialogHighscore.setSize(Pendu.getLargeurEcran()*.8f,Pendu.getHauteurEcran()*.8f) ;
-   			dialogHighscore.setPosition(Pendu.getLargeurEcran()*.1f, Pendu.getHauteurEcran()*.1f);
+   			dialogHighscore.setSize(Pendu.getLargeurEcran()*0.8f,Pendu.getHauteurEcran()*0.7f) ;
+   			dialogHighscore.setPosition(Pendu.getLargeurEcran()*0.1f,Pendu.getHauteurEcran()*0.15f);
    		}
    		
         stage.getViewport().update(width, height, true);
@@ -179,8 +180,6 @@ public class EcranPerdu implements Screen {
         
         Pendu.score.temps = temps ;		        //On met à jour le temps écoulé
         position = Pendu.highscore.proposeScore(Pendu.score) ;	//Puis on determine la position dans les highscores
-
-        position = 1 ;
         
         if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.score) ;
     	if (Pendu.getDebugState() && position >= 0) Gdx.app.log("INFO"," ("+POSITION[position]+" dans les highscores)");
@@ -206,11 +205,11 @@ public class EcranPerdu implements Screen {
     	lHighscore = new Label("Vous avez realise une super partie et vous etes "+POSITION[position]+
     		" dans les highscores. Vous pouvez changez votre nom ci-dessous pour enregistrer votre record.", Pendu.getSkin()) ;
     	lHighscore.setWrap(true);
-    	lHighscore.setSize(Pendu.getLargeurEcran()*0.7f, Pendu.getHauteurEcran()*.07f);
+    	lHighscore.setAlignment(Align.center); 
    		lHighscore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la hauteur de l'affichage
-
+   		lHighscore.setFillParent(true);
+   		
    		saisieNom = new TextField(Pendu.score.joueur, Pendu.getSkin()) ;
-//    	saisieNom.setScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la hauteur de l'affichage
    		saisieNom.setMaxLength(Highscore.LONGUEUR_MAX_NOM_JOUEUR);
 
     	dialogHighscore = new Dialog("Felicitations !", Pendu.getSkin())
@@ -224,14 +223,27 @@ public class EcranPerdu implements Screen {
             };
         };
         dialogHighscore.button(boutonOK) ;	//On rajoute le bouton OK
+
+
         dialogHighscore.text(lHighscore) ;	//Le texte d'information
+        
+        celluleTexteHighscore = dialogHighscore.getContentTable().getCell(lHighscore).align(Align.left).expand().width(Pendu.getLargeurEcran()*0.75f) ;
         dialogHighscore.getContentTable().row() ;
         dialogHighscore.getContentTable().add(saisieNom) ;	//Et la zone de saisie du nom du joueur
         dialogHighscore.setMovable(true);
         dialogHighscore.setResizable(true);
-        dialogHighscore.setResizeBorder(2);
+        dialogHighscore.setResizeBorder(8);
         
+        
+        if (Pendu.getDebugState()) {
+        	dialogHighscore.setDebug(true) ; // This is optional, but enables debug lines for tables.
+        	dialogHighscore.getContentTable().setDebug(true) ;
+        }
+
         dialogHighscore.show(stage) ;	//Affiche la fenetre de dialogue
+        dialogHighscore.setSize(Pendu.getLargeurEcran()*0.8f,Pendu.getHauteurEcran()*0.7f);
+		dialogHighscore.setPosition(Pendu.getLargeurEcran()*0.1f,Pendu.getHauteurEcran()*0.15f);
+
     }
     
 
