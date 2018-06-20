@@ -35,6 +35,7 @@ public class Pendu extends Game {
     public static EcranGagne ecranGagne ;
     public static EcranPerdu ecranPerdu ;
     public static EcranChoixDictionnaire ecranChoixDictionnaire ;
+    public static EcranHighscores ecranHighscores ;
     
     public static Table tPartie ;  //Table contenant la partie
     public static Table tFin ;  //Table contenant l'écran de fin (gagné ou perdu)
@@ -45,12 +46,13 @@ public class Pendu extends Game {
     public static String motDevine ;
     public static Label lMotDevine; //texte du mot à deviner
     public static Label lNbEssaisRestants ;	//Texte indiquant le nombre d'essais restant au joueur avant de perdre
-    public static Label	lNbMotsDevinnes ;	//Texte indiquant le nombre de mots devinnés d'affilés jusqu'ici
+    public static Label	lNbMotsDevines ;	//Texte indiquant le nombre de mots devinés d'affilés jusqu'ici
     public static BarreMinuteur	barreMinuteur ;	//Barre de progression pour le minuteur
     public static String lettresProposes ;
     public static Niveau niveau ;		//Niveau de difficulté sélectionné
     public static int nbErreurs ;	//Nombre de mauvaises lettres proposées
-    public static int nbMotsDevinnes ;	//Nombre de mots devinnés à la suite dans la partie en cours
+    public static int nbMotsDevines ;	//Nombre de mots devinés à la suite dans la partie en cours
+    public static Chrono chrono ;	//Chronometre de la partie
     public static final int NB_IMAGES = 12 ;
     public static final String IMAGE_GAGNE = "images/gagne.gif" ;   //Image affichée en cas de victoire
     public static final String IMAGE_PERDU = "images/perdu.jpg" ;   //Image affichée en cas de défaite
@@ -61,7 +63,9 @@ public class Pendu extends Game {
     public static final String CHEMIN_FICHIERS_DICTIONNAIRES = "Dictionnaires/" ;	//Chemin vers les fichiers dictionnaires
     public static String[][]	listeDictionnaires ;
     public static Dictionnaire	dictionnaire ;	//Dictionnaire en cours
-    public static int score ;   //score
+    public static Score score ;   //score
+    public static Logger logger ;	//Objet permettant de logger les parties
+    public static Highscore highscore ;	//Classe de gestion des highscores
     public static final Niveau[] niveaux = {
     	new Niveau("Niveau 1", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
     	new Niveau("Niveau 2",  true, false, 90f, new float[][] {{0.01f,0f},{10,5,5}}                  		 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
@@ -70,13 +74,19 @@ public class Pendu extends Game {
     	new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}) ,
     	new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11})    } ;
     
-    public static final float[] pourcentages = {0.6f, 0.4f, 0.2f, 0f} ;
-    public static final int[]	gains = {10, 6, 4, 1, 0} ;
+//    public static final float[] pourcentages = {0.6f, 0.4f, 0.2f, 0f} ;
+//    public static final int[]	gains = {10, 6, 4, 1, 0} ;
 
 	
     public void create() {
-        score = 0 ;
+        listeDictionnaires = Dictionnaire.getListeDictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
+        dictionnaire = new Dictionnaire(listeDictionnaires[0][2]);		//Initialisation du premier dictionnaire
+        
         niveau = niveaux[0] ;	//Par défaut on commence au niveau 1
+        score = new Score(niveau.numero,dictionnaire.langue) ;	//Par défaut on a un score nul
+        score.joueur = "Florent" ;
+
+        score.niveau = niveau.numero ;
         largeurEcran = Gdx.graphics.getWidth();
         hauteurEcran = Gdx.graphics.getHeight();
 
@@ -89,8 +99,10 @@ public class Pendu extends Game {
         //Chargement des éléments en mémoire
         ChargeImagesPendu();		//Les images de la pendaison progressive
         
-        listeDictionnaires = Dictionnaire.getListeDictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
-        dictionnaire = new Dictionnaire(listeDictionnaires[0][2]);		//Initialisation du premier dictionnaire
+        
+        chrono = new Chrono() ;	//Crée une instance de la classe Chrono pour chronometrer la partie
+        logger = new Logger() ; //Pour enregistrer les bilans des parties
+        highscore = new Highscore(1,dictionnaire.getLangue()) ;
         
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
@@ -123,7 +135,8 @@ public class Pendu extends Game {
     public static EcranJeu getEcranJeu() { return ecranJeu ; }
     public static EcranGagne getEcranGagne() { return ecranGagne ; }
     public static EcranPerdu getEcranPerdu() { return ecranPerdu ; }
-    public static int getScore() { return score; }
+    public static EcranHighscores getEcranHighscores() { return ecranHighscores ; }
+    public static int getScore() { return score.score; }
     public static int getNbErreurs() { return nbErreurs ; } ;
     public static Niveau getNiveau() { return niveau ; }
 
@@ -135,25 +148,26 @@ public class Pendu extends Game {
     	return tabTaillesAdaptees[1][i] ;
     }
     
-    public void setLargeurEcran(int l) { largeurEcran = l ; }
-    public void setHauteurEcran(int h) { hauteurEcran = h ; }
-    public void setEcranAccueil(EcranAccueil e) { ecranAccueil = e ; }
-    public void setEcranReglages(EcranReglages e) { ecranReglages = e ; }
-    public void setEcranChoixDictionnaire(EcranChoixDictionnaire e) { ecranChoixDictionnaire = e ; }
-    public void setEcranJeu(EcranJeu e) { ecranJeu = e ; }
+    public static void setLargeurEcran(int l) { largeurEcran = l ; }
+    public static void setHauteurEcran(int h) { hauteurEcran = h ; }
+    public static void setEcranAccueil(EcranAccueil e) { ecranAccueil = e ; }
+    public static void setEcranReglages(EcranReglages e) { ecranReglages = e ; }
+    public static void setEcranChoixDictionnaire(EcranChoixDictionnaire e) { ecranChoixDictionnaire = e ; }
+    public static void setEcranJeu(EcranJeu e) { ecranJeu = e ; }
     public static void setEcranGagne(EcranGagne e) { ecranGagne = e ; }
-    public void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
-    public void setScore(int s) { score = s ; }
+    public static void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
+    public static void setEcranHighscores(EcranHighscores e) { ecranHighscores = e ; }
+    public void setScore(int s) { score.score = s ; }
     public void setNiveau(Niveau n) { niveau = n ; }
 
     public void pause() {
         if (DEBUG) Gdx.app.log("INFO","L'appli se met en pause...") ;
-        barreMinuteur.pause() ;
+        if (barreMinuteur != null) barreMinuteur.pause() ;
     }
 
     public void resume() {
         if (DEBUG) Gdx.app.log("INFO","L'appli sort de pause...") ;
-        barreMinuteur.resume() ;
+        if (barreMinuteur != null) barreMinuteur.resume() ;
     }
 
 	public void dispose () {
@@ -164,5 +178,8 @@ public class Pendu extends Game {
         ecranJeu = null ;
         ecranPerdu = null ;
         ecranReglages = null ;
+        ecranHighscores = null ;
+        if (DEBUG) Gdx.app.log("INFO","Fermeture - fermeture du fichier de log") ;
+        if (logger != null) logger.fermeture();
 	}
 }

@@ -1,6 +1,8 @@
 package fr.jeux.pendu;
 
 import java.io.BufferedReader;
+import java.util.Arrays;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
@@ -64,17 +66,21 @@ public class Dictionnaire {
 	public int getNbMots() { return nbMots ; } ;
 	
 	public static String[][] getListeDictionnaires(String cheminDictionnaires) {
-		FileHandle[]	listeRepertoire ;
+		FileHandle[]	listeHandlesRepertoire ;
 		String fichier ;
 		String[][] listeDictionnaires ;
 	    BufferedReader reader = null;
 
 		
-		listeRepertoire = Gdx.files.internal(cheminDictionnaires).list() ;
+		listeHandlesRepertoire = Gdx.files.internal(cheminDictionnaires).list() ;
+		String[] listeRepertoire = new String[listeHandlesRepertoire.length] ;
+		for (int i = 0 ; i < listeHandlesRepertoire.length ; i++) listeRepertoire[i] = listeHandlesRepertoire[i].toString() ;	//Recopie les chemins dans le tableau de String
 		if (DEBUG) 	Gdx.app.log("INFO", listeRepertoire.length + " dictionnaires trouvés");
+		Arrays.sort(listeRepertoire);							//Tri par ordre alphabetique pour les avoir dans le bon ordre
+
 		listeDictionnaires = new String[listeRepertoire.length][3] ;
 		for (int i = 0 ; i < listeRepertoire.length ; i++) {
-			fichier = listeRepertoire[i].toString() ;
+			fichier = listeRepertoire[i] ;
 			try {
 				reader = new BufferedReader(Gdx.files.internal(fichier).reader());
 				listeDictionnaires[i][0] = reader.readLine() ;	//Lit le nom du dictionnaire

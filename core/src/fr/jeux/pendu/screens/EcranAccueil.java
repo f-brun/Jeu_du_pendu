@@ -23,7 +23,7 @@ public class EcranAccueil implements Screen {
     public Stage stage ;
     public Table tMenu ;  //Table contenant le menu
 
-    protected TextButton boutonJeu, boutonReglages ;
+    protected TextButton boutonJeu, boutonReglages, boutonHighscores ;
     protected Label titre;
     protected Image imageTitre;
 
@@ -49,6 +49,7 @@ public class EcranAccueil implements Screen {
         titre = new Label("Jeu du pendu\n", Pendu.getSkin());
         boutonJeu = new TextButton("Jouer", Pendu.getSkin());
         boutonReglages = new TextButton("Reglages", Pendu.getSkin());
+        boutonHighscores = new TextButton("Highscores", Pendu.getSkin());
         
         img = Pendu.getImagesPendu()[Pendu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
         imageTitre = new Image(img);
@@ -60,14 +61,17 @@ public class EcranAccueil implements Screen {
         tMenu.row();
         tMenu.add(boutonReglages).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
+        tMenu.add(boutonHighscores).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        tMenu.row();
         tMenu.add(imageTitre);
 
         boutonJeu.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
             	if (Pendu.getDebugState()) Gdx.app.log("INFO","raz du nb de mots devinnés");
-            	Pendu.nbMotsDevinnes = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
-            	if (Pendu.lNbMotsDevinnes != null) Pendu.lNbMotsDevinnes.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevinnes);
+            	Pendu.nbMotsDevines = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
+            	if (Pendu.lNbMotsDevines != null) Pendu.lNbMotsDevines.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines);
 
+            	jeu.chrono.depart(); 	//Lance le chrono
             	if (Pendu.getEcranJeu() == null) {
                		jeu.setScreen(new EcranJeu(jeu));	//Crée l'écran de jeu
                	}
@@ -88,6 +92,17 @@ public class EcranAccueil implements Screen {
             }
         } ) ;
  
+        boutonHighscores.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor acteur) {
+               	if (Pendu.getEcranHighscores() == null) {
+               		jeu.setScreen(new EcranHighscores(jeu));	//Crée l'écran de jeu
+               	}
+               	else {
+               		jeu.setScreen(Pendu.getEcranHighscores());	//Bascule sur l'écran de jeu déjà existant
+               	}
+            }
+        } ) ;
+
     }
 
     @Override

@@ -107,7 +107,7 @@ package fr.jeux.pendu.screens;
 	    public void resize(int width, int height) {
 	    	jeu.setHauteurEcran(height) ;
 	    	jeu.setLargeurEcran(width) ;
-	    	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+	    	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
 	   		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
 	        celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte précisant la langue choisie
 
@@ -116,7 +116,7 @@ package fr.jeux.pendu.screens;
 
 	    @Override
 	    public void show() {
-	        if (Pendu.getDebugState()) Gdx.app.log("EcranChoixDictionnaire","show");
+	        if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranChoixDictionnaire - show");
 	        Gdx.input.setInputProcessor(stage);
 
 	    }

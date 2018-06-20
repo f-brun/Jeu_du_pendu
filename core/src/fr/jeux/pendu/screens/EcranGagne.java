@@ -69,10 +69,11 @@ public class EcranGagne implements Screen {
   
         imageGagne.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                if (Pendu.getDebugState()) {
-                    System.out.println("Nouveau mot");
-                }
-                if (jeu.getEcranJeu() == null) {
+                if (Pendu.getDebugState()) Gdx.app.log("INFO", "Nouveau mot");
+
+                Pendu.chrono.reprise() ;		//On fait repartir le chrono pour le nouveau mot
+                
+                if (Pendu.getEcranJeu() == null) {
                 	jeu.setEcranJeu(new EcranJeu(jeu));
                 }
                 else jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
@@ -101,14 +102,14 @@ public class EcranGagne implements Screen {
     public void resize(int width, int height) {
     	jeu.setHauteurEcran(height) ;
     	jeu.setLargeurEcran(width) ;
-    	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
    		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
     	stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-    	if (Pendu.getDebugState()) Gdx.app.log("EcranGagné","show");
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranGagné - show");
         Gdx.input.setInputProcessor(stage);
         
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage

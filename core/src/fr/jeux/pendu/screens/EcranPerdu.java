@@ -1,25 +1,42 @@
 package fr.jeux.pendu.screens;
 
+import static com.badlogic.gdx.utils.Timer.schedule;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import fr.jeux.pendu.Highscore;
 import fr.jeux.pendu.Pendu;
+import fr.jeux.pendu.Score;
 
 public class EcranPerdu implements Screen {
     public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
 			 												{   3, 2.5f,   2f, 1.5f,   1f, 0.5f}};
 
+    public static final float[][] TAILLES_POLICE_ADAPTEES_DIALOGUE = {{800,  600,  400,  300,  200,  100,    0},
+																	 {   2, 1.8f, 1.5f,   1f, 0.8f, 0.5f, 0.4f}};
+
+    public static final String[] POSITION = {"premier", "deuxieme", "troisieme", "quatrieme", "cinquieme", "sixieme", "septieme", "huitieme", "neuvieme", "dixieme",
+    								"onzieme", "douzieme", "treizieme", "quatorzieme", "quinzieme", "seizieme", "dix-septieme", "dix-huitieme", "dix-neuvieme", "vingtieme"} ;
+
+    static final float DUREE_AFFICHAGE_PERDU = 1 ;	//Temps d'attente avant de pouvoir passer à la suite
+    
     private static Stage stage = null ;
     private static Table table = null ;  //Table contenant les labels
 
@@ -27,6 +44,12 @@ public class EcranPerdu implements Screen {
     private static Texture img = null ; 
     private static Image imagePerdu = null ;
     private static Label lTexteATrouver = null ;
+    
+    public static int position ; 	//Position dans la liste des highscores à l'issu du jeu
+    public static Dialog dialogHighscore ;	//Fenetre de dialogue pour informer qu'un highscore vient d'etre realise
+	public static TextField	saisieNom ;	//Textfield pour la saisie du nom du joueur
+	Label		lHighscore ;
+
     
     Cell<Label>	celluleTexteATrouver ;
 
@@ -80,24 +103,30 @@ public class EcranPerdu implements Screen {
         stage.addActor(table) ;
         
         imagePerdu.addListener(new ClickListener() {
-//            Pendu jeu ;
             public void clicked(InputEvent event, float x, float y) {
-/*                if (jeu.getDebugState()) {
-                    System.out.println("Retour au menu");
-                }*/
-                Pendu.ecranPerdu.RetourMenu() ;
+            	if (EcranPerdu.position == -1) 	Pendu.ecranPerdu.retourMenu() ;
+            	else Pendu.ecranPerdu.highscoreObtenu() ;
             }
         });
     	
     }
 
    
-    public void RetourMenu() {
+    public void retourMenu() {
     	if (Pendu.getEcranAccueil() != null) {
     		jeu.setScreen(Pendu.getEcranAccueil());	//Bascule sur l'écran d'accueil
     	}
     	else {
     		jeu.setScreen(new EcranAccueil(jeu));	//Bascule sur l'écran d'accueil
+    	}
+    }
+
+    public void highscoreObtenu() {
+    	if (Pendu.getEcranHighscores() != null) {
+    		jeu.setScreen(Pendu.getEcranHighscores());	//Bascule sur l'écran d'accueil
+    	}
+    	else {
+    		jeu.setScreen(new EcranHighscores(jeu));	//Bascule sur l'écran d'accueil
     	}
     }
     
@@ -116,40 +145,106 @@ public class EcranPerdu implements Screen {
     }
 
     public void resize(int width, int height) {
-    	jeu.setHauteurEcran(height) ;
-    	jeu.setLargeurEcran(width) ;
-    	if (Pendu.getDebugState()) Gdx.app.log("Redimmensionnement vers ",width+" x "+height);
+    	Pendu.setHauteurEcran(height) ;
+    	Pendu.setLargeurEcran(width) ;
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
     	
    		celluleTexteATrouver.width(width) ;
    		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
    		lTexteATrouver.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
-    	
+   		if (lHighscore != null)	lHighscore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la largeur de l'affichage
+   		if (dialogHighscore != null) {
+   			dialogHighscore.setSize(Pendu.getLargeurEcran()*.8f,Pendu.getHauteurEcran()*.8f) ;
+   			dialogHighscore.setPosition(Pendu.getLargeurEcran()*.1f, Pendu.getHauteurEcran()*.1f);
+   		}
+   		
         stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-    	if (Pendu.getDebugState()) Gdx.app.log("EcranPerdu","show");
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranPerdu - show");
+    	
+    	imagePerdu.setTouchable(Touchable.disabled) ;
         Gdx.input.setInputProcessor(stage);
         
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
-        jeu.setScore(0) ;     //On remet le score à zéro après l'avoir affiché
+
+        long temps = Pendu.chrono.stop() ;
+        
+        //On écrit les infos pour le deboggage
+        if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + temps) ;
+        Pendu.logger.ecritLog("Florent", Pendu.score.score, Pendu.getNiveau().numero, temps, Pendu.dictionnaire.getLangue());
+        
+        Pendu.score.temps = temps ;		        //On met à jour le temps écoulé
+        position = Pendu.highscore.proposeScore(Pendu.score) ;	//Puis on determine la position dans les highscores
+
+        position = 1 ;
+        
+        if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.score) ;
+    	if (Pendu.getDebugState() && position >= 0) Gdx.app.log("INFO"," ("+POSITION[position]+" dans les highscores)");
+        
+        Timer.Task attenteFinie; //Contiendra le code a exécuter pour afficher l'image de fin après un délai
+        
+        attenteFinie = new Timer.Task(){
+        	@Override
+        	public void run() {
+            	imagePerdu.setTouchable(Touchable.enabled) ;
+            	if (EcranPerdu.position >= 0) {
+            		afficheDialogueHighscore() ;
+            	}
+        	}
+        } ;
+        schedule(attenteFinie,DUREE_AFFICHAGE_PERDU) ;
     }
+    
+    public void afficheDialogueHighscore() {
+    	TextButton	boutonOK ;
+    	
+    	boutonOK = new TextButton("OK",Pendu.getSkin()) ;
+    	lHighscore = new Label("Vous avez realise une super partie et vous etes "+POSITION[position]+
+    		" dans les highscores. Vous pouvez changez votre nom ci-dessous pour enregistrer votre record.", Pendu.getSkin()) ;
+    	lHighscore.setWrap(true);
+    	lHighscore.setSize(Pendu.getLargeurEcran()*0.7f, Pendu.getHauteurEcran()*.07f);
+   		lHighscore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la hauteur de l'affichage
+
+   		saisieNom = new TextField(Pendu.score.joueur, Pendu.getSkin()) ;
+//    	saisieNom.setScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la hauteur de l'affichage
+   		saisieNom.setMaxLength(Highscore.LONGUEUR_MAX_NOM_JOUEUR);
+
+    	dialogHighscore = new Dialog("Felicitations !", Pendu.getSkin())
+        {
+            protected void result(Object object)
+            {
+            	Pendu.score.joueur = saisieNom.getText() ;
+            	Pendu.highscore.getMeilleursScores()[EcranPerdu.position].joueur = Pendu.score.joueur ;	//On change le nom du joueur
+            	Pendu.highscore.ecritScores(); 	//et on sauvegarde les scores
+            	Pendu.ecranPerdu.highscoreObtenu() ;	//puis on bascule sur l'écran des highscores
+            };
+        };
+        dialogHighscore.button(boutonOK) ;	//On rajoute le bouton OK
+        dialogHighscore.text(lHighscore) ;	//Le texte d'information
+        dialogHighscore.getContentTable().row() ;
+        dialogHighscore.getContentTable().add(saisieNom) ;	//Et la zone de saisie du nom du joueur
+        dialogHighscore.setMovable(true);
+        dialogHighscore.setResizable(true);
+        dialogHighscore.setResizeBorder(2);
+        
+        dialogHighscore.show(stage) ;	//Affiche la fenetre de dialogue
+    }
+    
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     
