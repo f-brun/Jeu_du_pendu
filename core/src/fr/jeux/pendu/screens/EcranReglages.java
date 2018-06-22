@@ -35,7 +35,7 @@ public class EcranReglages implements Screen {
     public EcranReglages(Pendu jeuEnCours) {
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
     	
-    	jeu.setEcranReglages(this) ; 	//Enregistre la référence de cet écran
+    	Pendu.setEcranReglages(this) ; 	//Enregistre la référence de cet écran
     	
         stage = new Stage(new ScreenViewport());
 
@@ -64,7 +64,8 @@ public class EcranReglages implements Screen {
      //Prï¿½pare le listener des boutons langue
         listeNiveaux.addListener( new ChangeListener() {
         	public void changed(ChangeEvent event, Actor acteur) {
-                List<String> liste = (List<String>) acteur ;
+                @SuppressWarnings("unchecked")
+				List<String> liste = (List<String>) acteur ;
                	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau selectionne, on prend le premier de la liste
                	Pendu.niveau = Pendu.niveaux[liste.getSelectedIndex()];
             }
@@ -90,7 +91,7 @@ public class EcranReglages implements Screen {
         boutonRetour.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
             	if (Pendu.getEcranAccueil() == null ) {
-            		jeu.setEcranAccueil(new EcranAccueil(jeu));
+            		Pendu.setEcranAccueil(new EcranAccueil(jeu));
             	}
             	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'ecran d'accueil
             }
@@ -98,7 +99,7 @@ public class EcranReglages implements Screen {
         table.row() ;
         table.add(boutonRetour).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         
-        langueChoisie = new Label("\nLangue en cours : "+Pendu.dictionnaire.getLangue(), Pendu.getSkin()) ;
+        langueChoisie = new Label("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue(), Pendu.getSkin()) ;
         langueChoisie.setWrap(true); //Autorise le passage a la ligne si le texte est trop grand
         langueChoisie.setAlignment(Align.center); //Centre le texte dans la boite
 
@@ -117,8 +118,8 @@ public class EcranReglages implements Screen {
     }
 
     public void resize(int width, int height) {
-    	jeu.setHauteurEcran(height) ;
-    	jeu.setLargeurEcran(width) ;
+    	Pendu.setHauteurEcran(height) ;
+    	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
    		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police ï¿½ la hauteur de l'affichage
         celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte precisant la langue choisie
@@ -131,7 +132,7 @@ public class EcranReglages implements Screen {
         if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranReglages - show");
         Gdx.input.setInputProcessor(stage);
         listeNiveaux.setSelectedIndex(Pendu.getNiveau().numero); 	//On se positionne sur le niveau actuel
-        langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaire.getLangue()) ;
+        langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()) ;
     }
 
     @Override
@@ -157,7 +158,7 @@ public class EcranReglages implements Screen {
     @Override
     public void dispose() {
         if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran des reglages") ;
-    	jeu.setEcranReglages(null) ;	//Supprime la reference a l'ecran pour l'obliger a etre re-cree la prochaine fois
+    	Pendu.setEcranReglages(null) ;	//Supprime la reference a l'ecran pour l'obliger a etre re-cree la prochaine fois
         if (Pendu.DEBUG) Gdx.app.log("INFO","Destruction du stage") ;
     	stage.dispose();
     }

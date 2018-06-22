@@ -13,7 +13,6 @@ package fr.jeux.pendu.screens;
 	import com.badlogic.gdx.utils.Align;
 	import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-	import fr.jeux.pendu.Dictionnaire;
 	import fr.jeux.pendu.Pendu;
 
 	public class EcranChoixDictionnaire implements Screen{
@@ -35,7 +34,7 @@ package fr.jeux.pendu.screens;
 	    public EcranChoixDictionnaire(Pendu jeuEnCours) {
 	    	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
 	    	
-	    	jeu.setEcranChoixDictionnaire(this) ; 	//Enregistre la référence de cet écran
+	    	Pendu.setEcranChoixDictionnaire(this) ; 	//Enregistre la référence de cet écran
 	    	
 	        stage = new Stage(new ScreenViewport());
 
@@ -53,7 +52,7 @@ package fr.jeux.pendu.screens;
 	        table.add(titre);
 	        table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
 
-	        boutonLangue = new TextButton[Pendu.listeDictionnaires.length] ;
+	        boutonLangue = new TextButton[Pendu.dictionnaires.getListeDictionnaires().length] ;
 
 	        //Prépare le listener des boutons langue
 	        listenerLangues = new ChangeListener() {
@@ -61,21 +60,21 @@ package fr.jeux.pendu.screens;
                 	int index ;
                 	//On récupère l'index à partir du début de la chaîne du nom du bouton
                 	index = Integer.parseInt(((TextButton)acteur).getText().toString().substring(1,((TextButton)acteur).getText().toString().indexOf("-")-1)) ;
-                	Pendu.dictionnaire = new Dictionnaire(Pendu.listeDictionnaires[index-1][2]) ; //Et on charge le dictionnaire correspondant
-                	langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaire.getLangue()+ " ("+Pendu.dictionnaire.getNbMots()+" mots)");
+                	Pendu.dictionnaires.setDictionnaire(index-1) ; //Et on charge le dictionnaire correspondant
+                	langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()+ " ("+Pendu.dictionnaires.getDictionnaireActuel().getNbMots()+" mots)");
 	            }
 	        } ;
 
 	        
-	        for (int i = 0 ; i < Pendu.listeDictionnaires.length ; i++) {
-	        	boutonLangue[i] = new TextButton(" "+(i+1)+" - "+Pendu.listeDictionnaires[i][0],Pendu.getSkin());
+	        for (int i = 0 ; i < Pendu.dictionnaires.getListeDictionnaires().length ; i++) {
+	        	boutonLangue[i] = new TextButton(" "+(i+1)+" - "+Pendu.dictionnaires.getListeDictionnaires()[i][0],Pendu.getSkin());
 	        	boutonLangue[i].addListener(listenerLangues) ;
 	            table.add(boutonLangue[i]).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS).align(Align.center) ;	//Ajoute le bouton à l'UI
 	            table.row();					//Et passe à la ligne suivante
 	        }
 
 	        boutonRetour = new TextButton("Retour", Pendu.getSkin());
-	        langueChoisie = new Label("Langue en cours : "+Pendu.dictionnaire.getLangue()+ " ("+Pendu.dictionnaire.getNbMots()+" mots)", Pendu.getSkin()) ;
+	        langueChoisie = new Label("Langue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()+ " ("+Pendu.dictionnaires.getDictionnaireActuel().getNbMots()+" mots)", Pendu.getSkin()) ;
 	        langueChoisie.setWrap(true); //Autorise le passage à la ligne si le texte est trop grand
 	        langueChoisie.setAlignment(Align.center); //Centre le texte dans la boite
 
@@ -105,8 +104,8 @@ package fr.jeux.pendu.screens;
 	    }
 
 	    public void resize(int width, int height) {
-	    	jeu.setHauteurEcran(height) ;
-	    	jeu.setLargeurEcran(width) ;
+	    	Pendu.setHauteurEcran(height) ;
+	    	Pendu.setLargeurEcran(width) ;
 	    	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
 	   		titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
 	        celluleLangueChoisie.width(Pendu.getLargeurEcran()) ;	//Redimensionne la cellule contenant le texte précisant la langue choisie
@@ -143,7 +142,7 @@ package fr.jeux.pendu.screens;
 	     */
 	    @Override
 	    public void dispose() {
-	    	jeu.setEcranChoixDictionnaire(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+	    	Pendu.setEcranChoixDictionnaire(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
 	    	stage.dispose();
 	    }
 	}

@@ -62,3 +62,14 @@
 20/06/2018 23:23:41;Niveau 0;Florent;0;5;Francais
 20/06/2018 23:25:47;Niveau 0;Florent;0;6;Francais
 20/06/2018 23:28:43;Niveau 0;Florent;0;7;Francais
+22/06/2018 11:13:44;Niveau 0;Florent;10;32;Anglais
+22/06/2018 11:15:13;Niveau 2;Florent;30;29;Anglais
+22/06/2018 11:23:59;Niveau 2;Florent;0;29;Francais
+22/06/2018 11:29:08;Niveau 1;Florent;0;27;Francais
+22/06/2018 11:54:49;Niveau 1;Florent;30;87;Francais
+22/06/2018 11:56:55;Niveau 2;Florent;16;51;Francais
+22/06/2018 12:00:11;Niveau 3;Florent;20;24;Francais
+22/06/2018 12:02:32;Niveau 4;Florent;10;41;Francais
+22/06/2018 12:05:06;Niveau 5;Florent;0;9;Francais
+22/06/2018 12:05:15;Niveau 5;Florent;0;6;Francais
+22/06/2018 12:05:47;Niveau 5;Florent;4;26;Francais

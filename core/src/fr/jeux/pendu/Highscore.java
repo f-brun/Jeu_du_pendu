@@ -2,7 +2,6 @@ package fr.jeux.pendu;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -16,20 +15,20 @@ public class Highscore {
 	
 	private BufferedWriter	writer ;
 	private BufferedReader	reader ;
-	private int	niveau ;
+	private Niveau	niveau ;
 	private String dictionnaire ;
 	private int	nbScores ;
 	private Score[] meilleursScores ;
 	
 	private String nomFichierHighscores ;
 	
-	public Highscore(int niveau, String dictionnaire) {
+	public Highscore(Niveau niveau, String dictionnaire) {
 		this.niveau = niveau ;
 		this.dictionnaire = dictionnaire ;
-		this.nomFichierHighscores = BASE_FICHIER_HIGHSCORE+"N"+niveau+"_"+dictionnaire ;
+		this.nomFichierHighscores = BASE_FICHIER_HIGHSCORE+niveau.denomination+"_"+dictionnaire ;
 		meilleursScores = new Score[NB_HIGHSCORES_PAR_CATEGORIE] ;
 		nbScores = litFichierHighscore(nomFichierHighscores) ;
-		for (int i = nbScores ; i < NB_HIGHSCORES_PAR_CATEGORIE ; i++ )	meilleursScores[i] = new Score(niveau, dictionnaire) ;	//On met à 0 les scores suivants jusqu'à remplir le tableau
+		for (int i = nbScores ; i < NB_HIGHSCORES_PAR_CATEGORIE ; i++ )	meilleursScores[i] = new Score(niveau.numero, dictionnaire) ;	//On met à 0 les scores suivants jusqu'à remplir le tableau
 	}
 	
 	private int litFichierHighscore(String fichier) {

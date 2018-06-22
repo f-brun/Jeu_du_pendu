@@ -26,7 +26,7 @@ public class EcranGagne implements Screen {
     private static Texture img = null ; 
     private static Image imageGagne = null ;
 
-    Pendu jeu ;	//référence aux données du jeu
+    public static Pendu jeu ;	//référence aux données du jeu
     
     public EcranGagne(Pendu jeuEnCours) {
 
@@ -74,7 +74,7 @@ public class EcranGagne implements Screen {
                 Pendu.chrono.reprise() ;		//On fait repartir le chrono pour le nouveau mot
                 
                 if (Pendu.getEcranJeu() == null) {
-                	jeu.setEcranJeu(new EcranJeu(jeu));
+                	Pendu.setEcranJeu(new EcranJeu(EcranGagne.jeu));
                 }
                 else jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
             }
@@ -100,8 +100,8 @@ public class EcranGagne implements Screen {
     }
 
     public void resize(int width, int height) {
-    	jeu.setHauteurEcran(height) ;
-    	jeu.setLargeurEcran(width) ;
+    	Pendu.setHauteurEcran(height) ;
+    	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
    		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
     	stage.getViewport().update(width, height, true);

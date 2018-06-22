@@ -1,24 +1,24 @@
 package fr.jeux.pendu;
 
 import java.io.BufferedReader;
-import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 
 public class Dictionnaire {
 
 	static final boolean	DEBUG = false ;
+	int numero ;
 	String	langue ;
 	int		nbMots ;
 	String[]	Mots ;
 	
 	
-	public Dictionnaire(String fichier) {
+	public Dictionnaire(int numero, String fichier) {
 	    boolean finLecture ;
 	    BufferedReader reader = null;
 	    String ligne;
 	    nbMots = 0;
+	    this.numero = numero ;
 	    
 	    try {
 	    	if (DEBUG) Gdx.app.log("INFO", "Debut lecture dico - "+fichier);
@@ -62,38 +62,7 @@ public class Dictionnaire {
 		return Mots[(int) (Math.random() * nbMots)];
 	}
 	
+	public int getNumero() { return numero; } ;
 	public String getLangue() { return langue ; } ;
-	public int getNbMots() { return nbMots ; } ;
-	
-	public static String[][] getListeDictionnaires(String cheminDictionnaires) {
-		FileHandle[]	listeHandlesRepertoire ;
-		String fichier ;
-		String[][] listeDictionnaires ;
-	    BufferedReader reader = null;
-
-		
-		listeHandlesRepertoire = Gdx.files.internal(cheminDictionnaires).list() ;
-		String[] listeRepertoire = new String[listeHandlesRepertoire.length] ;
-		for (int i = 0 ; i < listeHandlesRepertoire.length ; i++) listeRepertoire[i] = listeHandlesRepertoire[i].toString() ;	//Recopie les chemins dans le tableau de String
-		if (DEBUG) 	Gdx.app.log("INFO", listeRepertoire.length + " dictionnaires trouvés");
-		Arrays.sort(listeRepertoire);							//Tri par ordre alphabetique pour les avoir dans le bon ordre
-
-		listeDictionnaires = new String[listeRepertoire.length][3] ;
-		for (int i = 0 ; i < listeRepertoire.length ; i++) {
-			fichier = listeRepertoire[i] ;
-			try {
-				reader = new BufferedReader(Gdx.files.internal(fichier).reader());
-				listeDictionnaires[i][0] = reader.readLine() ;	//Lit le nom du dictionnaire
-				listeDictionnaires[i][1] = reader.readLine() ;	//Lit le nombre de mots
-				listeDictionnaires[i][2] = fichier;				//Stocke le chemin d'accès
-				if (DEBUG) 	Gdx.app.log("INFO", "Dictionnaire trouvé : "+listeDictionnaires[i][0]+" avec "+listeDictionnaires[i][1]+" mots");
-				reader.close();
-			} catch (Exception e) {
-		        reader = null ;
-		        Gdx.app.log("ERROR", "Erreur dans la lecture du fichier de dictionnaire "+fichier);
-			}
-		}
-		
-		return listeDictionnaires ;
-	}
+	public int getNbMots() { return nbMots ; }
 }

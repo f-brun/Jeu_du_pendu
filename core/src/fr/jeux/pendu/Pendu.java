@@ -61,11 +61,10 @@ public class Pendu extends Game {
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
     public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
     public static final String CHEMIN_FICHIERS_DICTIONNAIRES = "Dictionnaires/" ;	//Chemin vers les fichiers dictionnaires
-    public static String[][]	listeDictionnaires ;
-    public static Dictionnaire	dictionnaire ;	//Dictionnaire en cours
+    public static Dictionnaires	dictionnaires ;			//Dictionnaires du jeu
     public static Score score ;   //score
     public static Logger logger ;	//Objet permettant de logger les parties
-    public static Highscore highscore ;	//Classe de gestion des highscores
+    public static Highscores highscores ;	//Classe de gestion des highscores
     public static final Niveau[] niveaux = {
     	new Niveau("Niveau 1", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
     	new Niveau("Niveau 2",  true, false, 90f, new float[][] {{0.01f,0f},{10,5,5}}                  		 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
@@ -74,19 +73,14 @@ public class Pendu extends Game {
     	new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}) ,
     	new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11})    } ;
     
-//    public static final float[] pourcentages = {0.6f, 0.4f, 0.2f, 0f} ;
-//    public static final int[]	gains = {10, 6, 4, 1, 0} ;
-
-	
     public void create() {
-        listeDictionnaires = Dictionnaire.getListeDictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
-        dictionnaire = new Dictionnaire(listeDictionnaires[0][2]);		//Initialisation du premier dictionnaire
+        dictionnaires = new Dictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
+        dictionnaires.setDictionnaire(0);		//Initialisation du premier dictionnaire
         
         niveau = niveaux[0] ;	//Par défaut on commence au niveau 1
-        score = new Score(niveau.numero,dictionnaire.langue) ;	//Par défaut on a un score nul
+        score = new Score(niveau.numero,dictionnaires.getDictionnaireActuel().langue) ;	//Par défaut on a un score nul
         score.joueur = "Florent" ;
 
-        score.niveau = niveau.numero ;
         largeurEcran = Gdx.graphics.getWidth();
         hauteurEcran = Gdx.graphics.getHeight();
 
@@ -102,7 +96,7 @@ public class Pendu extends Game {
         
         chrono = new Chrono() ;	//Crée une instance de la classe Chrono pour chronometrer la partie
         logger = new Logger() ; //Pour enregistrer les bilans des parties
-        highscore = new Highscore(1,dictionnaire.getLangue()) ;
+        highscores = new Highscores(niveaux,dictionnaires.getNomsDictionnaires()) ;
         
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }

@@ -69,9 +69,10 @@ public class EcranAccueil implements Screen {
             public void changed(ChangeEvent event, Actor acteur) {
             	if (Pendu.getDebugState()) Gdx.app.log("INFO","raz du nb de mots devinnés");
             	Pendu.nbMotsDevines = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
+            	Pendu.score.score = 0 ;
             	if (Pendu.lNbMotsDevines != null) Pendu.lNbMotsDevines.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines);
 
-            	jeu.chrono.depart(); 	//Lance le chrono
+            	Pendu.chrono.depart(); 	//Lance le chrono
             	if (Pendu.getEcranJeu() == null) {
                		jeu.setScreen(new EcranJeu(jeu));	//Crée l'écran de jeu
                	}
@@ -114,8 +115,8 @@ public class EcranAccueil implements Screen {
     }
 
     public void resize(int width, int height) {
-    	jeu.setHauteurEcran(height) ;
-    	jeu.setLargeurEcran(width) ;
+    	Pendu.setHauteurEcran(height) ;
+    	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
     	titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
         stage.getViewport().update(width, height, true);
@@ -150,7 +151,7 @@ public class EcranAccueil implements Screen {
      */
     @Override
     public void dispose() {
-    	jeu.setEcranAccueil(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	Pendu.setEcranAccueil(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
     	img.dispose();
     	stage.dispose();
     }

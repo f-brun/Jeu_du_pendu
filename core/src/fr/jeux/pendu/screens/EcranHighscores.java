@@ -3,19 +3,14 @@ package fr.jeux.pendu.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -54,13 +49,13 @@ public class EcranHighscores implements Screen {
 
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
  
-    	if (Pendu.getEcranHighscores() == null) jeu.setEcranHighscores(this); 	//Ecrit la référence à l'écran que l'on vient de créer
+    	if (Pendu.getEcranHighscores() == null) Pendu.setEcranHighscores(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     }
     
     private void creeUI() {
-    	Score[] highScore = Pendu.highscore.getMeilleursScores() ;
+    	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
 
     	
        	stage = new Stage(new ScreenViewport());
@@ -128,7 +123,7 @@ public class EcranHighscores implements Screen {
         boutonRetour = new TextButton("Retour", Pendu.getSkin());
         boutonRetour.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-            	if (Pendu.getEcranAccueil() == null ) jeu.setEcranAccueil(new EcranAccueil(jeu));
+            	if (Pendu.getEcranAccueil() == null ) Pendu.setEcranAccueil(new EcranAccueil(jeu));
             	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'ecran d'accueil
             }
         } ) ;
@@ -148,7 +143,7 @@ public class EcranHighscores implements Screen {
     }
     
     private void actualiseUI() {
-    	Score[] highScore = Pendu.highscore.getMeilleursScores() ;
+    	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
     	
     	tScores.columnDefaults(0).minWidth(40);
     	tScores.columnDefaults(1).minWidth(120) ;
@@ -172,8 +167,8 @@ public class EcranHighscores implements Screen {
     }
 
     public void resize(int width, int height) {
-    	jeu.setHauteurEcran(height) ;
-    	jeu.setLargeurEcran(width) ;
+    	Pendu.setHauteurEcran(height) ;
+    	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
     	
 //   		celluleTexteATrouver.width(width) ;
@@ -213,7 +208,7 @@ public class EcranHighscores implements Screen {
      */
     @Override
     public void dispose() {
-    	jeu.setEcranHighscores(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	Pendu.setEcranHighscores(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
     	stage.dispose();
     }
 }
