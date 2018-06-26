@@ -46,7 +46,6 @@ public class EcranPerdu implements Screen {
     private static Image imagePerdu = null ;
     private static Label lTexteATrouver = null ;
     
-    public static int position ; 	//Position dans la liste des highscores à l'issu du jeu
     public static Dialog dialogHighscore ;	//Fenetre de dialogue pour informer qu'un highscore vient d'etre realise
 	public static TextField	saisieNom ;	//Textfield pour la saisie du nom du joueur
 	Label		lHighscore ;
@@ -106,7 +105,9 @@ public class EcranPerdu implements Screen {
         
         imagePerdu.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-            	if (EcranPerdu.position == -1) 	Pendu.ecranPerdu.retourMenu() ;
+            	if (Pendu.position == -1) {
+            		Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
+            	}
             	else Pendu.ecranPerdu.highscoreObtenu() ;
             }
         });
@@ -169,17 +170,16 @@ public class EcranPerdu implements Screen {
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
 
-        long temps = Pendu.chrono.stop() ;
-        
+    	Pendu.score.temps = Pendu.chrono.stop() ;		        //On met à jour le temps écoulé
+    	Pendu.score.nbMotsDevines = Pendu.nbMotsDevines ;	//et le nombre de mots trouvés
+    	
         //On écrit les infos pour le deboggage
-        if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + temps) ;
-        Pendu.logger.ecritLog("Florent", Pendu.score.score, Pendu.getNiveau().numero, temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());
-        
-        Pendu.score.temps = temps ;		        //On met à jour le temps écoulé
-        position = Pendu.highscores.getHighscoreActuel().proposeScore(Pendu.score) ;	//Puis on determine la position dans les highscores
+        if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + Pendu.score.temps) ;
+        Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log        
+        Pendu.position = Pendu.highscores.getHighscoreActuel().insereScore(Pendu.score) ;	//Puis on determine la position dans les highscores
         
         if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.score) ;
-    	if (Pendu.getDebugState() && position >= 0) Gdx.app.log("INFO"," ("+POSITION[position]+" dans les highscores)");
+    	if (Pendu.getDebugState() && Pendu.position >= 0) Gdx.app.log("INFO"," ("+POSITION[Pendu.position]+" dans les highscores)");
         
         Timer.Task attenteFinie; //Contiendra le code a exécuter pour afficher l'image de fin après un délai
         
@@ -187,7 +187,7 @@ public class EcranPerdu implements Screen {
         	@Override
         	public void run() {
             	imagePerdu.setTouchable(Touchable.enabled) ;
-            	if (EcranPerdu.position >= 0) {
+            	if (Pendu.position >= 0) {
             		afficheDialogueHighscore() ;
             	}
         	}
@@ -199,7 +199,7 @@ public class EcranPerdu implements Screen {
     	TextButton	boutonOK ;
     	
     	boutonOK = new TextButton("OK",Pendu.getSkin()) ;
-    	lHighscore = new Label("Vous avez realise une super partie et vous etes "+POSITION[position]+
+    	lHighscore = new Label("Vous avez realise une super partie et vous etes "+POSITION[Pendu.position]+
     		" dans les highscores. Vous pouvez changez votre nom ci-dessous pour enregistrer votre record.", Pendu.getSkin()) ;
     	lHighscore.setWrap(true);
     	lHighscore.setAlignment(Align.center); 
@@ -211,9 +211,10 @@ public class EcranPerdu implements Screen {
         {
             protected void result(Object object)
             {
-            	Pendu.score.joueur = saisieNom.getText() ;
-            	Pendu.highscores.getHighscoreActuel().getMeilleursScores()[EcranPerdu.position].joueur = Pendu.score.joueur ;	//On change le nom du joueur
+            	Pendu.score.joueur = saisieNom.getText() ;	//On change le nom du joueur
+            	Pendu.highscores.getHighscoreActuel().setHighscore(Pendu.position, Pendu.score) ;	//Inscrit le score dans la table des highscores
             	Pendu.highscores.getHighscoreActuel().ecritScores(); 	//et on sauvegarde les scores
+                Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
             	Pendu.ecranPerdu.highscoreObtenu() ;	//puis on bascule sur l'écran des highscores
             };
         };
@@ -270,7 +271,7 @@ public class EcranPerdu implements Screen {
      */
     @Override
     public void dispose() {
-    	jeu.setEcranPerdu(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	Pendu.setEcranPerdu(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
     	stage.dispose();
     }
 }

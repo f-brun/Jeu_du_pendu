@@ -70,6 +70,8 @@ public class EcranAccueil implements Screen {
             	if (Pendu.getDebugState()) Gdx.app.log("INFO","raz du nb de mots devinnés");
             	Pendu.nbMotsDevines = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
             	Pendu.score.score = 0 ;
+            	Pendu.score.niveau = Pendu.getNiveau().getNumero() ;
+            	Pendu.score.dictionnaire = Pendu.dictionnaires.getDictionnaireActuel().getLangue() ;
             	if (Pendu.lNbMotsDevines != null) Pendu.lNbMotsDevines.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines);
 
             	Pendu.chrono.depart(); 	//Lance le chrono
@@ -125,6 +127,7 @@ public class EcranAccueil implements Screen {
     @Override
     public void show() {
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranAccueil - show");
+    	Pendu.position = -1 ;	//Remet à -1 la position dans les highscores avant une nouvelle partie
         Gdx.input.setInputProcessor(stage);
 
     }

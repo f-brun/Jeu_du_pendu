@@ -18,11 +18,11 @@ public class Logger {
 		
 	}
 	
-	public void ecritLog(String joueur,int score, int niveau, long temps, String dico) {
+	public void ecritLog(int niveau, String joueur,int score, int nbMots, long temps, String dico) {
 		try {
 			writer.newLine();
 			writer.write(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.FRANCE).format(new Date()));
-			writer.write(";Niveau "+niveau+";"+joueur+";"+score+";"+temps+";"+dico) ;
+			writer.write(";Niveau "+niveau+";"+joueur+";"+score+";"+nbMots+";"+temps+";"+dico) ;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

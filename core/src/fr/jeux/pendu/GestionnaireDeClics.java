@@ -40,11 +40,11 @@ public class GestionnaireDeClics extends ChangeListener {
                 }	
             } else {
                 Pendu.nbErreurs++;
-                Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().nbErreursMax - Pendu.getNbErreurs())); ;
+                Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax() - Pendu.getNbErreurs())); ;
                 if (Pendu.DEBUG) System.out.println("La lettre " + lettreProposee + " n'est pas dans le mot");
                 if (Pendu.DEBUG) System.out.println(Pendu.getNbErreurs() + " erreur(s) jusqu'ici");
-                Pendu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(Pendu.getImagesPendu()[Pendu.getNiveau().imagesPendaison[Pendu.getNbErreurs()]])));
-                if (Pendu.getNbErreurs() >= Pendu.getNiveau().nbErreursMax) {	//On a perdu
+                Pendu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(Pendu.getImagesPendu()[Pendu.getNiveau().getNiveauDeJeu().getImagesPendaison()[Pendu.getNbErreurs()]])));
+                if (Pendu.getNbErreurs() >= Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax()) {	//On a perdu
                     Pendu.ecranJeu.perdu(jeu);
                 }
             }

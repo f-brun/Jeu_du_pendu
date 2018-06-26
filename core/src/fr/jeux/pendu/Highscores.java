@@ -13,6 +13,6 @@ public class Highscores {
 	}
 	
 	public Highscore getHighscoreActuel() {
-		return highscores[Pendu.niveau.numero][Pendu.dictionnaires.getDictionnaireActuel().getNumero()] ;
+		return highscores[Pendu.niveau.getNumero()][Pendu.dictionnaires.getDictionnaireActuel().getNumero()] ;
 	}
 }

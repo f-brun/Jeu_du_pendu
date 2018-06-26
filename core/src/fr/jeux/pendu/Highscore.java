@@ -10,7 +10,8 @@ import com.badlogic.gdx.Gdx;
 public class Highscore {
 	private static final String BASE_FICHIER_HIGHSCORE = "Highscores/Highscore_" ;
 	public static final int NB_HIGHSCORES_PAR_CATEGORIE = 15 ;
-	public static final String DELIMITEUR_ENREGISTREMENTS = ";" ;
+	public static final String DELIMITEUR_ENREGISTREMENTS = ";" ;	
+	public static final String CARACTERE_REMPLACEMENT = "_" ;		//Caractere de remplacement si le nom du joueur contient le délimiteur
 	public static final int LONGUEUR_MAX_NOM_JOUEUR = 15 ;		//Nombre max de caracteres dans le nom du joueur
 	
 	private BufferedWriter	writer ;
@@ -25,10 +26,10 @@ public class Highscore {
 	public Highscore(Niveau niveau, String dictionnaire) {
 		this.niveau = niveau ;
 		this.dictionnaire = dictionnaire ;
-		this.nomFichierHighscores = BASE_FICHIER_HIGHSCORE+niveau.denomination+"_"+dictionnaire ;
+		this.nomFichierHighscores = BASE_FICHIER_HIGHSCORE+niveau.getDenomination()+"_"+dictionnaire ;
 		meilleursScores = new Score[NB_HIGHSCORES_PAR_CATEGORIE] ;
 		nbScores = litFichierHighscore(nomFichierHighscores) ;
-		for (int i = nbScores ; i < NB_HIGHSCORES_PAR_CATEGORIE ; i++ )	meilleursScores[i] = new Score(niveau.numero, dictionnaire) ;	//On met à 0 les scores suivants jusqu'à remplir le tableau
+		for (int i = nbScores ; i < NB_HIGHSCORES_PAR_CATEGORIE ; i++ )	meilleursScores[i] = new Score(niveau.getNumero(), dictionnaire) ;	//On met à 0 les scores suivants jusqu'à remplir le tableau
 	}
 	
 	private int litFichierHighscore(String fichier) {
@@ -55,11 +56,12 @@ public class Highscore {
 				chaineDecoupee = new StringTokenizer(ligne,DELIMITEUR_ENREGISTREMENTS) ;
 				if (chaineDecoupee.hasMoreTokens()) {
 					meilleursScores[nbScoresLus] = new Score(
-						Integer.parseInt(chaineDecoupee.nextToken()),
-						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu",
-						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,
-						(chaineDecoupee.hasMoreTokens()) ? Long.parseLong(chaineDecoupee.nextToken()) : 999999,
-						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu") ;
+						Integer.parseInt(chaineDecoupee.nextToken()),											//Numéro du niveau
+						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu",				//Nom du joueur
+						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,	//Score
+						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,	//Nb de mots devinnes
+						(chaineDecoupee.hasMoreTokens()) ? Long.parseLong(chaineDecoupee.nextToken()) : 999999,	//Temps de jeu
+						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu") ;			//Dictionnaire
 					nbScoresLus++ ;
 				}
 			}
@@ -83,11 +85,10 @@ public class Highscore {
 
 		//Fabrique la ligne a insérer dans le fichier de highscore
 		String ligne = "" ;
-		ligne += score.niveau + DELIMITEUR_ENREGISTREMENTS ;
-		ligne += score.joueur + DELIMITEUR_ENREGISTREMENTS ;
-		ligne += score.score + DELIMITEUR_ENREGISTREMENTS ;
-		ligne += score.temps + DELIMITEUR_ENREGISTREMENTS ;
-		ligne += score.dictionnaire ;
+		for (int i = 0 ; i < Score.NOM_ITEMS_SCORE.length-1 ; i++) {
+			ligne += score.getStringItemScore(i) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
+		}
+		ligne += score.getStringItemScore(Score.NOM_ITEMS_SCORE.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
 		
 		try {
 			writer.write(ligne);
@@ -113,13 +114,14 @@ public class Highscore {
 
 		for (int i = 0 ; i < meilleursScores.length ; i++) {
 			score = meilleursScores[i] ;
+			score.joueur = score.joueur.replaceAll(DELIMITEUR_ENREGISTREMENTS, CARACTERE_REMPLACEMENT) ;	//Remplace les occurences du délimiteur dans le nom du joueur
+
 			//Fabrique la ligne a insérer dans le fichier de highscore
 			ligne = "" ;
-			ligne += score.niveau + DELIMITEUR_ENREGISTREMENTS ;
-			ligne += score.joueur + DELIMITEUR_ENREGISTREMENTS ;
-			ligne += score.score + DELIMITEUR_ENREGISTREMENTS ;
-			ligne += score.temps + DELIMITEUR_ENREGISTREMENTS ;
-			ligne += score.dictionnaire ;
+			for (int j = 0 ; j < Score.NOM_ITEMS_SCORE.length-1 ; j++) {
+				ligne += score.getStringItemScore(j) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
+			}
+			ligne += score.getStringItemScore(Score.NOM_ITEMS_SCORE.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
 			
 			try {
 				writer.write(ligne);
@@ -138,10 +140,12 @@ public class Highscore {
 	 * @param score	Score à évaluer
 	 * @return position du score dans la table (0 = 1ere position) ou -1 si pas dans les highscores
 	 */
-	public int proposeScore(Score score) {
+	public int insereScore(Score score) {
 		int i ;
 		for (i = meilleursScores.length - 1 ; i > 0 ; i--) {	//On part de la fin
-			if ( (score.score > meilleursScores[i].score) || (score.score == meilleursScores[i].score && score.temps <= meilleursScores[i].temps) ) {	//Si le nouveau score est meilleur
+			if ( (score.score > meilleursScores[i].score)
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) ) {	//Si le nouveau score est meilleur
 				meilleursScores[i] = meilleursScores[i-1] ;		//On recopie pour decaler les highscores et faire de la place pour ce nouveau record
 			}
 			else if (i > 0) {	//Si ce score est moins bon
@@ -150,7 +154,9 @@ public class Highscore {
 			}
 		}
 		if (i == 0) {	//Si i = 0, il reste a comparer avec le premier 
-			if ( (score.score > meilleursScores[i].score) || (score.score == meilleursScores[i].score && score.temps <= meilleursScores[i].temps) ) {	//Si ce score est meilleur
+			if ( (score.score > meilleursScores[i].score)
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) ) {	//Si ce score est meilleur
 				meilleursScores[i] = score ;	//On prend la place du premier (l'ancien premier a déjà été inscrit en 2° position)
 				ecritScores() ;
 				return 0 ;
@@ -158,7 +164,6 @@ public class Highscore {
 			else meilleursScores[1] = score ;	//Sinon on est en deuxième position
 		}
 		if (i < meilleursScores.length-1) {
-			ecritScores() ;	//Met à jour le fichier
 			return i+1 ;	//Si on est dans les records, on renvoit la place correspondante 
 		}
 		else return -1 ;	//Sinon on renvoit -1 pour indiquer qu'on est pas dans les highscores
@@ -166,5 +171,12 @@ public class Highscore {
 
 	public Score[] getMeilleursScores() { return meilleursScores ; }
 
+	public void setHighscore(int numero, Score score) {
+		meilleursScores[numero] = score ;
+	}
+	
+	public Score getHighscore(int numero) { return meilleursScores[numero] ; }
+	
+	public Niveau getNiveau() { return this.niveau ; }
 }
 

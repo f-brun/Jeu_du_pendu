@@ -19,6 +19,7 @@ public class Chrono {
 			tempsDebut = System.currentTimeMillis() ;
 			tempsFin = tempsPause = dureePause = 0 ;
 			running = true ;
+			enPause = false ;
 		}
 	}
 	
@@ -51,5 +52,11 @@ public class Chrono {
 
 	public void reset() {
 		tempsDebut = tempsFin = tempsPause = 0 ;
+		running = enPause = false ;
+	}
+	
+	public long soustraitDuree(long dureeASoustraire) {
+		tempsDebut += dureeASoustraire ;
+		return (tempsFin - tempsDebut - dureePause)/1000 ;	//renvoi la duree totale du chrono (hors pauses)
 	}
 }

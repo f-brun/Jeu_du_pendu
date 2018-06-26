@@ -57,7 +57,7 @@ public class EcranReglages implements Screen {
         listeNiveaux = new List<String>(Pendu.getSkin()) ;
         intitulesNiveaux = new String[Pendu.niveaux.length] ;
         for (int i = 0 ; i < Pendu.niveaux.length ; i++) {
-        	intitulesNiveaux[i] = Pendu.niveaux[i].denomination ;
+        	intitulesNiveaux[i] = Pendu.niveaux[i].getDenomination() ;
         }
         listeNiveaux.setItems(intitulesNiveaux) ;
         
@@ -131,7 +131,7 @@ public class EcranReglages implements Screen {
     public void show() {
         if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranReglages - show");
         Gdx.input.setInputProcessor(stage);
-        listeNiveaux.setSelectedIndex(Pendu.getNiveau().numero); 	//On se positionne sur le niveau actuel
+        listeNiveaux.setSelectedIndex(Pendu.getNiveau().getNumero()); 	//On se positionne sur le niveau actuel
         langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()) ;
     }
 

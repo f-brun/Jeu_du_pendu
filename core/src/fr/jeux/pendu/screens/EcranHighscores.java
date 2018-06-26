@@ -2,6 +2,7 @@ package fr.jeux.pendu.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,8 +25,16 @@ public class EcranHighscores implements Screen {
     public static final String[] POSITION = {"premier", "deuxieme", "troisieme", "quatrieme", "cinquieme", "sixieme", "septieme", "huitieme", "neuvieme", "dixieme",
     								"onzieme", "douzieme", "treizieme", "quatorzieme", "quinzieme", "seizieme", "dix-septieme", "dix-huitieme", "dix-neuvieme", "vingtieme"} ;
 
-    static final int[] COL_HIGHSCORES = {1, 2, 3, 4 } ;
-    static final String[] NOMS_COL = {"Rang", "Nom", "Score", "Temps"} ;
+    static final int[] COL_HIGHSCORES = {0, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS } ;
+    static final String[] NOMS_COL = {"Rang", "Nom", "Score", "Mots", "Temps"} ;
+    static final int[][] TAILLES_COLONNES = { {40,80}, {200,800}, {70,160}, {70,100}, {90,180} } ;	//Largeurs min et max des colonnes
+    static final int ESPACEMENT_COLONNES = 10 ;		//Espacement entre les colonnes
+     	
+   	static final int[] ALIGNEMENTS_COL_HIGHSCORES = {Align.right, Align.left, Align.center, Align.center, Align.center} ;
+    static final float[] LARGEUR_COLONNES_HIGHSCORES = {10f,40f,15f,15f,15f} ;	//Largeurs des colonnes de highscore en %
+    static final float LARGEUR_MAX_HIGHSCORES = 0.9f ;		//Largeur maxi des highscores en % de la fenêtre
+    static final float COEF_HIGHSCORES = 0.85f ;
+    static final float COEF_SCORE_JOUEUR = 1.2f ;
     
     private static Stage stage = null ;
     private static Table table = null ;  //Table contenant l'UI
@@ -37,6 +46,9 @@ public class EcranHighscores implements Screen {
     private static Table tScores = null ;	//Table contenant la liste des scores
     private static Label[] lColonnes = null ; 	//Labels des têtes de colonne
     private static Label[][] lScores = null ;	//Labels contenant les informations sur les highscores
+    private static Cell<Label>[][]	clScores	= null ;
+    private static Cell<ScrollPane> celluleTable = null ;
+    
     
     private static TextButton boutonRetour = null ;
 
@@ -54,7 +66,8 @@ public class EcranHighscores implements Screen {
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     }
     
-    private void creeUI() {
+    @SuppressWarnings("unchecked")
+	private void creeUI() {
     	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
 
     	
@@ -64,61 +77,50 @@ public class EcranHighscores implements Screen {
         
 
         table = new Table() ;
-        
-        lTitre = new Label("Meilleurs scores", Pendu.getSkin()) ;
-        table.add(lTitre) ;
-        table.row();
-        
-        		
         //Définit la disposition de la table
-        table.pad(3) ;
         if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
         table.setFillParent(true);  //La table occupe tout l'écran
-
         stage.addActor(table) ;
         
-
+        lTitre = new Label("Meilleurs scores\n"+Pendu.highscores.getHighscoreActuel().getNiveau().getDenomination(), Pendu.getSkin()) ;
+        lTitre.setAlignment(Align.center);
+        table.add(lTitre).width(Pendu.getLargeurEcran()) ;
+        table.row();
+ 
         tScores = new Table() ;
         if (Pendu.getDebugState()) tScores.setDebug(true); // This is optional, but enables debug lines for tables.
-        
-        scrollpane = new ScrollPane(tScores, Pendu.getSkin()) ;
-        table.add(scrollpane) ;
 
-       	tScores.columnDefaults(0).width(45).space(10);
-    	tScores.columnDefaults(1).width(350).space(10);
-    	tScores.columnDefaults(2).width(60).space(10);
-    	tScores.columnDefaults(3).width(80).space(10);
+    	lColonnes = new Label[NOMS_COL.length] ;	//Tableau contenant les labels des titres des colonnes
 
-    	lColonnes = new Label[NOMS_COL.length] ;
-    	
+    	//Création des têtes de colonnes
     	for (int i = 0 ; i < NOMS_COL.length ; i++) {
+    		tScores.columnDefaults(i).minWidth(TAILLES_COLONNES[i][0]).maxWidth(TAILLES_COLONNES[i][1]).space(ESPACEMENT_COLONNES) ;	//Spéficifations des colonnes
     		lColonnes[i] = new Label(NOMS_COL[i],Pendu.getSkin()) ;
-    		tScores.add(lColonnes[i]) ;
+    		lColonnes[i].setAlignment(ALIGNEMENTS_COL_HIGHSCORES[i]);
+    		tScores.add(lColonnes[i]).align(ALIGNEMENTS_COL_HIGHSCORES[i]) ;
     	}
-    	lColonnes[0].setAlignment(Align.center);
-    	lColonnes[1].setAlignment(Align.left);
-    	lColonnes[2].setAlignment(Align.center);
-    	lColonnes[3].setAlignment(Align.center);
-    	
-    	
+
+    	//Création du contenu des colonnes
     	lScores = new Label[Highscore.NB_HIGHSCORES_PAR_CATEGORIE][NOMS_COL.length] ;
+    	clScores = new Cell[Highscore.NB_HIGHSCORES_PAR_CATEGORIE][NOMS_COL.length] ;
     	
     	for (int i = 0 ; i < highScore.length ; i++) {
-    		tScores.row() ;
-    		lScores[i][0] = new Label(Integer.toString(i+1), Pendu.getSkin()) ;
-    		lScores[i][0].setAlignment(Align.right);
-    		tScores.add(lScores[i][0]);
-    		lScores[i][1] = new Label(highScore[i].joueur, Pendu.getSkin()) ;
-    		lScores[i][1].setAlignment(Align.left);
-    		tScores.add(lScores[i][1]) ;
-    		lScores[i][2] = new Label(Integer.toString(highScore[i].score), Pendu.getSkin()) ;
-    		lScores[i][2].setAlignment(Align.center);
-    		tScores.add(lScores[i][2]) ;
-    		lScores[i][3] = new Label(Long.toString(highScore[i].temps), Pendu.getSkin()) ;
-    		lScores[i][3].setAlignment(Align.center);
-    		tScores.add(lScores[i][3]) ;
-     	}
-        
+     		tScores.row() ;
+    		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
+        		if (COL_HIGHSCORES[j] == 0) {			//Si c'est le rang
+        			lScores[i][j] = new Label(Integer.toString(i+1), Pendu.getSkin()) ;	//On inscrit l'index +1 pour avoir le numero de rang
+        		}
+        		else lScores[i][j] = new Label(highScore[i].getStringItemScore(COL_HIGHSCORES[j]), Pendu.getSkin()) ;
+        		lScores[i][j].setAlignment(ALIGNEMENTS_COL_HIGHSCORES[j]);
+        		clScores[i][j] = tScores.add(lScores[i][j]) ;
+    		}
+    	}
+    	
+    	scrollpane = new ScrollPane(tScores, Pendu.getSkin()) ;
+    	
+        if (Pendu.getDebugState()) scrollpane.setDebug(true); // This is optional, but enables debug lines for tables.
+        celluleTable = table.add(scrollpane) ; //.align(Align.top).width(Pendu.getLargeurEcran()) ;
+
         
         boutonRetour = new TextButton("Retour", Pendu.getSkin());
         boutonRetour.addListener(new ChangeListener() {
@@ -145,16 +147,18 @@ public class EcranHighscores implements Screen {
     private void actualiseUI() {
     	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
     	
-    	tScores.columnDefaults(0).minWidth(40);
-    	tScores.columnDefaults(1).minWidth(120) ;
-    	tScores.columnDefaults(2).minWidth(80);
-    	tScores.columnDefaults(3).minWidth(120);
-
+    	lTitre.setText("Meilleurs scores\n"+Pendu.highscores.getHighscoreActuel().getNiveau().getDenomination()) ;
+    	
+    	//On met à jour le contenu de la table des highscores
     	for (int i = 0 ; i < highScore.length ; i++) {
-    		lScores[i][0].setText(Integer.toString(i+1)) ;
-    		lScores[i][1].setText(highScore[i].joueur) ;
-    		lScores[i][2].setText(Integer.toString(highScore[i].score)) ;
-    		lScores[i][3].setText(Long.toString(highScore[i].temps)) ;
+    		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
+        		if (COL_HIGHSCORES[j] == 0) {			//Si c'est le rang
+        			lScores[i][j].setText(Integer.toString(i+1)) ;
+        		}
+        		else {
+        			lScores[i][j].setText(highScore[i].getStringItemScore(COL_HIGHSCORES[j])) ;
+        		}
+    		}
     	}
     }
 
@@ -171,8 +175,38 @@ public class EcranHighscores implements Screen {
     	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
     	
-//   		celluleTexteATrouver.width(width) ;
    		lTitre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
+   		celluleTable.width(Pendu.getLargeurEcran()*LARGEUR_MAX_HIGHSCORES) ;
+
+   		//Redimensionne les tête de colonnes
+   		for (int j = 0 ; j < NOMS_COL.length ; j++) {
+    		lColonnes[j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_HIGHSCORES);	//Adapte la taille de la police à la largeur de l'affichage
+    	}
+   		
+   		float positionHighscore = 0 ;	//Position du highscore dans la table
+   		//Redimensionne le texte des scores en mettant la bonne couleur
+   		for (int i = 0 ; i < Pendu.highscores.getHighscoreActuel().getMeilleursScores().length ; i++) {
+     		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
+        		if (Pendu.position == i) {
+        			positionHighscore = lScores[i][0].getY() ;	//Récupère la position verticale du highscore dans la table
+        			lScores[i][j].setColor(Color.FIREBRICK);
+        			lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_SCORE_JOUEUR);	//Adapte la taille de la police à la hauteur de l'affichage
+        		}
+        		else {
+        			lScores[i][j].setColor(Color.WHITE);
+        			lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_HIGHSCORES);	//Adapte la taille de la police à la hauteur de l'affichage
+        		}
+        		clScores[i][j].prefWidth(Pendu.getLargeurEcran()*LARGEUR_COLONNES_HIGHSCORES[j]/100) ;
+    		}
+    	}
+   		if (Pendu.position != -1) scrollpane.scrollTo(0, positionHighscore, 10, 10); 	//On positionne le scorlling de manière à voir le highscore qu'on vient de réaliser
+
+   		tScores.setWidth(Pendu.getLargeurEcran());
+   		
+/*    	Gdx.app.log("INFO", "Scrollpane : x="+scrollpane.getScrollX()+" y="+scrollpane.getScrollY()+" larg ="+scrollpane.getWidth()+" haut="+scrollpane.getHeight());
+    	Gdx.app.log("INFO", "Scrollpane : posX="+scrollpane.getX()+" posY="+scrollpane.getY()+" prefW="+scrollpane.getPrefWidth()+" PrefH="+scrollpane.getPrefHeight());
+    	Gdx.app.log("INFO", "ScrollTo : y="+positionHighscore);
+*/
     	
         stage.getViewport().update(width, height, true);
     }
@@ -188,19 +222,15 @@ public class EcranHighscores implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
-
     
     /**
      * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques

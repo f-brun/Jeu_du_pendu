@@ -1,75 +1,25 @@
-15/06/2018;Niveau 0;Florent;0;46;Francais
-15/06/2018;Niveau 0;Florent;0;20;Francais
-15/06/2018;Niveau 3;Florent;0;30;Francais
-15/06/2018;Niveau 4;Florent;0;20;Anglais - mots communs
-15/06/2018 16:52:17;Niveau 5;Florent;0;7;Anglais - mots simples
-15/06/2018 16:52:33;Niveau 5;Florent;0;12;Anglais - mots simples
-15/06/2018 16:52:42;Niveau 5;Florent;0;6;Anglais - mots simples
-15/06/2018 16:53:00;Niveau 5;Florent;0;16;Anglais - mots simples
-15/06/2018 16:53:12;Niveau 5;Florent;0;6;Anglais - mots simples
-15/06/2018 16:53:21;Niveau 5;Florent;0;7;Anglais - mots simples
-15/06/2018 16:53:30;Niveau 5;Florent;0;6;Anglais - mots simples
-15/06/2018 16:53:37;Niveau 5;Florent;0;5;Anglais - mots simples
-15/06/2018 16:53:51;Niveau 5;Florent;0;11;Anglais - mots simples
-15/06/2018 16:54:24;Niveau 2;Florent;0;21;Anglais - mots simples
-16/06/2018 11:19:35;Niveau 0;Florent;20;84;Anglais
-16/06/2018 21:57:23;Niveau 0;Florent;30;61;Francais - difficile
-16/06/2018 21:57:54;Niveau 0;Florent;10;19;Francais - difficile
-18/06/2018 18:42:44;Niveau 0;Florent;0;14;Francais
-18/06/2018 18:43:35;Niveau 0;Florent;30;32;Francais
-18/06/2018 18:44:29;Niveau 0;Florent;10;19;Francais
-18/06/2018 18:45:14;Niveau 0;Florent;0;10;Francais
-18/06/2018 18:46:05;Niveau 0;Florent;20;39;Francais
-18/06/2018 18:46:43;Niveau 0;Florent;10;19;Francais
-18/06/2018 19:05:27;Niveau 0;Florent;20;31;Francais
-18/06/2018 19:06:40;Niveau 0;Florent;10;36;Francais
-18/06/2018 19:07:49;Niveau 0;Florent;10;56;Francais
-18/06/2018 19:09:26;Niveau 0;Florent;30;49;Francais
-18/06/2018 23:03:58;Niveau 0;Florent;20;63;Francais
-18/06/2018 23:05:21;Niveau 0;Florent;40;54;Francais
-18/06/2018 23:06:28;Niveau 0;Florent;20;40;Francais
-18/06/2018 23:27:12;Niveau 0;Florent;60;68;Francais
-18/06/2018 23:29:42;Niveau 0;Florent;50;105;Francais
-18/06/2018 23:30:18;Niveau 0;Florent;0;12;Francais
-18/06/2018 23:30:35;Niveau 0;Florent;0;15;Francais
-18/06/2018 23:31:45;Niveau 0;Florent;40;58;Francais
-18/06/2018 23:33:38;Niveau 0;Florent;30;84;Francais
-18/06/2018 23:35:06;Niveau 0;Florent;40;45;Francais
-18/06/2018 23:43:39;Niveau 0;Florent;60;114;Francais
-18/06/2018 23:46:40;Niveau 0;Florent;70;140;Francais
-19/06/2018 09:42:19;Niveau 0;Florent;10;16;Francais
-19/06/2018 09:47:52;Niveau 0;Florent;10;26;Francais
-19/06/2018 21:00:24;Niveau 0;Florent;0;7;Francais
-20/06/2018 11:10:39;Niveau 0;Florent;20;41;Francais
-20/06/2018 11:23:27;Niveau 0;Florent;10;41;Francais
-20/06/2018 11:41:30;Niveau 0;Florent;10;20;Francais
-20/06/2018 11:48:59;Niveau 0;Florent;10;15;Francais
-20/06/2018 17:51:12;Niveau 0;Florent;10;24;Francais
-20/06/2018 17:57:46;Niveau 0;Florent;10;15;Francais
-20/06/2018 18:09:39;Niveau 0;Florent;0;17;Francais
-20/06/2018 18:09:57;Niveau 0;Florent;10;12;Francais
-20/06/2018 18:49:25;Niveau 0;Florent;10;18;Francais
-20/06/2018 18:52:32;Niveau 0;Florent;10;28;Francais
-20/06/2018 19:34:42;Niveau 0;Florent;10;18;Francais
-20/06/2018 19:39:16;Niveau 0;Florent;0;5;Francais
-20/06/2018 19:40:56;Niveau 0;Florent;0;6;Francais
-20/06/2018 22:48:50;Niveau 0;Florent;0;5;Francais
-20/06/2018 23:03:03;Niveau 0;Florent;0;9;Francais
-20/06/2018 23:05:34;Niveau 0;Florent;0;5;Francais
-20/06/2018 23:08:48;Niveau 0;Florent;0;4;Francais
-20/06/2018 23:15:03;Niveau 0;Florent;0;9;Francais
-20/06/2018 23:16:07;Niveau 0;Florent;0;5;Francais
-20/06/2018 23:23:41;Niveau 0;Florent;0;5;Francais
-20/06/2018 23:25:47;Niveau 0;Florent;0;6;Francais
-20/06/2018 23:28:43;Niveau 0;Florent;0;7;Francais
-22/06/2018 11:13:44;Niveau 0;Florent;10;32;Anglais
-22/06/2018 11:15:13;Niveau 2;Florent;30;29;Anglais
-22/06/2018 11:23:59;Niveau 2;Florent;0;29;Francais
-22/06/2018 11:29:08;Niveau 1;Florent;0;27;Francais
-22/06/2018 11:54:49;Niveau 1;Florent;30;87;Francais
-22/06/2018 11:56:55;Niveau 2;Florent;16;51;Francais
-22/06/2018 12:00:11;Niveau 3;Florent;20;24;Francais
-22/06/2018 12:02:32;Niveau 4;Florent;10;41;Francais
-22/06/2018 12:05:06;Niveau 5;Florent;0;9;Francais
-22/06/2018 12:05:15;Niveau 5;Florent;0;6;Francais
-22/06/2018 12:05:47;Niveau 5;Florent;4;26;Francais
+
+22/06/2018 18:59:23;Niveau 0;Florent;10;20;Francais
+22/06/2018 19:00:21;Niveau 0;Fafa;10;34;Francais
+22/06/2018 21:16:45;Niveau 0;Florent;20;172;Francais
+22/06/2018 21:29:07;Niveau 2;Sophie;165;643;Francais
+22/06/2018 21:30:01;Niveau 5;Sophie;6;31;Francais
+22/06/2018 22:03:41;Niveau 4;Florent;0;30;Francais
+22/06/2018 22:03:51;Niveau 4;Florent;0;5;Francais
+22/06/2018 22:04:09;Niveau 4;Florent;0;16;Francais
+22/06/2018 22:04:27;Niveau 4;Florent;0;16;Francais
+22/06/2018 22:04:36;Niveau 4;Florent;0;7;Francais
+22/06/2018 22:04:57;Niveau 4;Florent;0;18;Francais
+22/06/2018 22:05:40;Niveau 4;Florent;1;36;Francais
+24/06/2018 22:17:34;Niveau 0;Florent;10;52;Francais
+24/06/2018 22:19:40;Niveau 0;Gege;20;41;Francais
+25/06/2018 22:41:49;Niveau 0;Florent;123;340;Francais
+25/06/2018 22:43:50;Niveau 0;S&F;10;19;Francais
+25/06/2018 23:24:01;Niveau 0;Florent;30;33;Francais
+25/06/2018 23:24:15;Niveau 0;Totor;30;33;Francais
+25/06/2018 23:52:47;Niveau 0;Florent;20;2;32;Francais
+25/06/2018 23:52:59;Niveau 0;Troiz;20;2;32;Francais
+26/06/2018 00:00:42;Niveau 0;Florent;40;4;55;Francais
+26/06/2018 00:01:01;Niveau 0;Delta bravo;40;4;55;Francais
+26/06/2018 00:05:24;Niveau 0;Florent;10;1;21;Francais
+26/06/2018 00:05:35;Niveau 0;Mr T;10;1;21;Francais

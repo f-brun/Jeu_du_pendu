@@ -65,20 +65,24 @@ public class Pendu extends Game {
     public static Score score ;   //score
     public static Logger logger ;	//Objet permettant de logger les parties
     public static Highscores highscores ;	//Classe de gestion des highscores
+    public static int position ; 	//Position dans la liste des highscores à l'issu du jeu
     public static final Niveau[] niveaux = {
-    	new Niveau("Niveau 1", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
-    	new Niveau("Niveau 2",  true, false, 90f, new float[][] {{0.01f,0f},{10,5,5}}                  		 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
-    	new Niveau("Niveau 3",  true, false, 60f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}    , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}) ,
-    	new Niveau("Niveau 4",  true, false, 40f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}	 ,  9, new int[] {0,1,2,3,4,5,6,7,9,11}),
-    	new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}) ,
-    	new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11})    } ;
+   new Niveau("Progressif", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}, new int[] {1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6 }) ,
+   new Niveau("Niveau 1", false, false,  0f, new float[][] {{0},{10,10}}                            	 , 11, new int[] {0,1,2,3,4,5,6,7,8,9,10,11}, new int[] {1,1}) ,
+   new Niveau("Niveau 2",  true, false, 90f, new float[][] {{0.01f,0f},{10,5,5}}                  		 , 10, new int[] {0,1,2,3,4,5,6,7,8,9,11}, new int[] {2,2}) ,
+   new Niveau("Niveau 3",  true, false, 60f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}    , 10, new int[] {0,1,2,3,4,5,6,7,8,9,11}, new int[] {3,3}) ,
+   new Niveau("Niveau 4",  true, false, 40f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}	 ,  9, new int[] {0,1,2,3,4,5,6,7,9,11}, new int[] {4,4}) ,
+   new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}, new int[] {5,5}) ,
+   new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11}, new int[] {6,6})    } ;
     
     public void create() {
         dictionnaires = new Dictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
         dictionnaires.setDictionnaire(0);		//Initialisation du premier dictionnaire
         
-        niveau = niveaux[0] ;	//Par défaut on commence au niveau 1
-        score = new Score(niveau.numero,dictionnaires.getDictionnaireActuel().langue) ;	//Par défaut on a un score nul
+        niveau = niveaux[0] ;	//Par défaut on commence au premier niveau
+        niveau.setNbNiveaux(niveaux.length) ;
+        
+        score = new Score(niveau.getNumero(),dictionnaires.getDictionnaireActuel().langue) ;	//Par défaut on a un score nul
         score.joueur = "Florent" ;
 
         largeurEcran = Gdx.graphics.getWidth();
@@ -97,6 +101,7 @@ public class Pendu extends Game {
         chrono = new Chrono() ;	//Crée une instance de la classe Chrono pour chronometrer la partie
         logger = new Logger() ; //Pour enregistrer les bilans des parties
         highscores = new Highscores(niveaux,dictionnaires.getNomsDictionnaires()) ;
+        position = -1 ;		//Avant de jouer on n'est pas place dans la liste des highscores
         
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
@@ -157,11 +162,13 @@ public class Pendu extends Game {
     public void pause() {
         if (DEBUG) Gdx.app.log("INFO","L'appli se met en pause...") ;
         if (barreMinuteur != null) barreMinuteur.pause() ;
+        if (chrono != null) chrono.pause();
     }
 
     public void resume() {
         if (DEBUG) Gdx.app.log("INFO","L'appli sort de pause...") ;
         if (barreMinuteur != null) barreMinuteur.resume() ;
+        if (chrono != null) chrono.reprise();
     }
 
 	public void dispose () {

@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import fr.jeux.pendu.Pendu;
 import fr.jeux.pendu.BarreMinuteur;
+import fr.jeux.pendu.Chrono;
 import fr.jeux.pendu.GestionnaireDeClics;
 
 import static com.badlogic.gdx.utils.Timer.schedule;
@@ -37,8 +38,11 @@ public class EcranJeu implements Screen {
     														{   1, 0.8f, 0.7f, 0.5f, 0.3f, 0.2f, 0.1f}};
     public static final float[][] TAILLES_POLICE_INFOS_ADAPTEES = {{800,  600,  400,  300,  200,   100,    0},
     															  {1.5f, 1.2f, 1.0f, 0.8f, 0.5f, 0.2f, 0.1f}};
-
-    static Pendu jeu ;	//référence aux données du jeu
+    public static final String TEXTE_NOMBRE_DE_MOTS_DEVINES = "Nombre de mots\ndevines :\n" ;
+    public static final String TEXTE_NB_ESSAIS_RESTANTS = "Nombre d'essais\nrestants :\n" ;
+	static Pendu jeu ;	//référence aux données du jeu
+    
+    Chrono chronoMot ;
 	
 	Stage	stage ;	//Conteneur général de l'écran
     Table	table;   //table principale sur laquelle s'affichent les éléments graphiques
@@ -53,6 +57,7 @@ public class EcranJeu implements Screen {
 
     public EcranJeu(Pendu jeuEnCours) {
     	jeu = jeuEnCours ;
+    	chronoMot = new Chrono() ;
     	
     	jeu.setEcranJeu(this); 	//Enregistre la référence de cet écran
     	
@@ -71,6 +76,7 @@ public class EcranJeu implements Screen {
                 jeu.motDevine += "_";   //Si c'est un caractère alphabétique, on remplace par un sous-tiret
             }
         }
+        chronoMot.depart();
     }
 
     private void creeUI(Pendu jeu) {
@@ -97,10 +103,10 @@ public class EcranJeu implements Screen {
         tInfos = new Table() ;
         if (jeu.getDebugState()) tInfos.setDebug(true); // This is optional, but enables debug lines for tables.
         
-        Pendu.lNbMotsDevines = new Label("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines,Pendu.getSkin()) ;
+        Pendu.lNbMotsDevines = new Label(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines,Pendu.getSkin()) ;
         Pendu.lNbMotsDevines.setAlignment(Align.center);
         jeu.affichagePendu = new Image(jeu.getImagesPendu()[0]) ;
-        Pendu.lNbEssaisRestants = new Label("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().nbErreursMax - Pendu.getNbErreurs()), Pendu.getSkin()) ;
+        Pendu.lNbEssaisRestants = new Label(TEXTE_NB_ESSAIS_RESTANTS+(Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax() - Pendu.getNbErreurs()), Pendu.getSkin()) ;
         Pendu.lNbEssaisRestants.setAlignment(Align.center);
 
 
@@ -137,7 +143,7 @@ public class EcranJeu implements Screen {
     private void actualiseUI() {
         jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));									//Ré-initialise le texte du mot ï¿½ deviner
     	jeu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(jeu.getImagesPendu()[0])));	//Remet l'image du pendu sur la première image
-        Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().nbErreursMax - Pendu.getNbErreurs())) ;
+        Pendu.lNbEssaisRestants.setText(TEXTE_NB_ESSAIS_RESTANTS+(Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax() - Pendu.getNbErreurs())) ;
     	
     	//Rend tous les acteurs visibles : cela permet de faire en sorte que toutes les lettres choisies précédemment ré-apparaissent
     	@SuppressWarnings("rawtypes")
@@ -147,8 +153,8 @@ public class EcranJeu implements Screen {
     		acteur.setVisible(true) ;
 		}
 
-        if (jeu.getNiveau().minuteur) {
-        	jeu.barreMinuteur.reset(jeu.niveau.dureeMinuteur, 0.2f, 0.4f, 0.6f);
+        if (jeu.getNiveau().getNiveauDeJeu().getMinuteur()) {
+        	jeu.barreMinuteur.reset(jeu.niveau.getNiveauDeJeu().getDureeMinuteur(), 0.2f, 0.4f, 0.6f);
         	jeu.barreMinuteur.setVisible(true); 
         	jeu.barreMinuteur.depart();
         }
@@ -160,6 +166,7 @@ public class EcranJeu implements Screen {
     
     public void gagne(Pendu jeu) {
     	jeu.chrono.pause();
+    	chronoMot.reset();	//On n'utilise pas le chrono du mot car on a gagné
         if (jeu.getDebugState()) Gdx.app.log("INFO", "Gagné !");
 
         jeu.barreMinuteur.stop();
@@ -168,7 +175,7 @@ public class EcranJeu implements Screen {
         jeu.score.score += jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent()) ;	//On ajoute des points en fonction de la rï¿½ussite du joueur
         jeu.nbMotsDevines++ ;
         
-        Pendu.lNbMotsDevines.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines);
+        Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines);
         
         //Ici on est obligé de passer par une tâche en parallèle, sinon l'actualisation de l'écran ne se fait pas et on ne pourrait pas voir le mot complété
         Timer.Task affichageGagne; //Contiendra le code ï¿½ exécuter pour afficher l'image de fin après un délai
@@ -193,6 +200,7 @@ public class EcranJeu implements Screen {
     public void perdu(Pendu jeu) {
     	jeu.barreMinuteur.stop();
     	jeu.chrono.pause();
+    	jeu.chrono.soustraitDuree(chronoMot.stop()) ;		//On soustrait la durée du mot en cours pour qu'il ne soit pas comptabilisé dans la durée de la partie
     	if (jeu.getEcranPerdu() == null) {
             jeu.setScreen(new EcranPerdu(jeu));		//Bascule sur l'écran de game over
     	}
@@ -205,7 +213,7 @@ public class EcranJeu implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         jeu.barreMinuteur.miseAJour() ;
 
-        if ((jeu.getNiveau().minuteurFaitPerdre) && (jeu.barreMinuteur.getPercent() == 0) ) {	//Si le temps est écoulé et que cela fait perdre
+        if ((jeu.getNiveau().getNiveauDeJeu().getMinuteurFaitPerdre()) && (jeu.barreMinuteur.getPercent() == 0) ) {	//Si le temps est écoulé et que cela fait perdre
             Timer.Task perduTempsEcoule ; //Contiendra le code à exécuter pour afficher l'image de fin après un délai
             
             perduTempsEcoule = new Timer.Task(){
