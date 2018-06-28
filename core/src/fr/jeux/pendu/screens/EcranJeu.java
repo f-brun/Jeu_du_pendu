@@ -42,7 +42,7 @@ public class EcranJeu implements Screen {
     public static final String TEXTE_NB_ESSAIS_RESTANTS = "Nombre d'essais\nrestants :\n" ;
 	static Pendu jeu ;	//référence aux données du jeu
     
-    Chrono chronoMot ;
+    public Chrono chronoMot ;
 	
 	Stage	stage ;	//Conteneur général de l'écran
     Table	table;   //table principale sur laquelle s'affichent les éléments graphiques
@@ -126,7 +126,7 @@ public class EcranJeu implements Screen {
         for (lettre = 'A'; lettre <= 'Z'; lettre++) {
             TextButton bouton = new TextButton(Character.toString(lettre), jeu.getSkin());
             if (i % jeu.getNbLettresParLigne() == 0) {
-                tLettres.row(); //On passe ï¿½ la ligne suivante
+                tLettres.row(); //On passe à la ligne suivante
             }
             i++;
             bouton.addListener(gestionnaireDeClics);
@@ -172,7 +172,7 @@ public class EcranJeu implements Screen {
         jeu.barreMinuteur.stop();
         jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));
 
-        jeu.score.score += jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent()) ;	//On ajoute des points en fonction de la rï¿½ussite du joueur
+        jeu.score.score += jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent()) ;	//On ajoute des points en fonction de la réussite du joueur
         jeu.nbMotsDevines++ ;
         
         Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines);
@@ -199,8 +199,10 @@ public class EcranJeu implements Screen {
     
     public void perdu(Pendu jeu) {
     	jeu.barreMinuteur.stop();
-    	jeu.chrono.pause();
-    	jeu.chrono.soustraitDuree(chronoMot.stop()) ;		//On soustrait la durée du mot en cours pour qu'il ne soit pas comptabilisé dans la durée de la partie
+    	jeu.chrono.stop();
+    	Pendu.score.temps = (int) jeu.chrono.soustraitDuree(chronoMot.stop())/1000 ;	//On soustrait la durée du mot en cours pour qu'il ne soit pas comptabilisé dans la durée de la partie
+    	Pendu.score.nbMotsDevines = Pendu.nbMotsDevines ;
+
     	if (jeu.getEcranPerdu() == null) {
             jeu.setScreen(new EcranPerdu(jeu));		//Bascule sur l'écran de game over
     	}

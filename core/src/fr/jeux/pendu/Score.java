@@ -10,13 +10,14 @@ public class Score {
 	public static final int SCORE = 3 ;
 	public static final int NB_MOTS_DEVINES = 4 ;
 	public static final int TEMPS = 5 ;
-	public static final int NOM_DICTIONNAIRE = 6 ;
+	public static final int TEMPS_HMS = 6 ;
+	public static final int NOM_DICTIONNAIRE = 7 ;
 	
 	public int	niveau ;
 	public String	joueur ;
 	public int	score ;
 	public int	nbMotsDevines ;
-	public long	temps ;
+	public int	temps ;
 	public String	dictionnaire ;
 	
 	public Score(int niveau, String dictionnaire) {
@@ -28,7 +29,7 @@ public class Score {
 		this.dictionnaire = dictionnaire ;
 	}
 	
-	public Score (int niveau, String joueur, int score, int nbMots, long temps, String dictionnaire) {
+	public Score (int niveau, String joueur, int score, int nbMots, int temps, String dictionnaire) {
 		this.joueur = joueur ;
 		this.niveau = niveau ;
 		this.score = score ;
@@ -49,6 +50,8 @@ public class Score {
 				return Integer.toString(this.nbMotsDevines) ;
 			case TEMPS :
 				return Long.toString(this.temps) ;
+			case TEMPS_HMS :
+				return Chrono.toHMS(this.temps) ; 
 			case NOM_DICTIONNAIRE :
 				return this.dictionnaire ;
 			default :

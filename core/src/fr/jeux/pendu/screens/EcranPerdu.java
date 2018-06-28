@@ -163,15 +163,12 @@ public class EcranPerdu implements Screen {
     @Override
     public void show() {
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranPerdu - show");
-    	
-    	imagePerdu.setTouchable(Touchable.disabled) ;
-        Gdx.input.setInputProcessor(stage);
-        
+       
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
 
-    	Pendu.score.temps = Pendu.chrono.stop() ;		        //On met à jour le temps écoulé
-    	Pendu.score.nbMotsDevines = Pendu.nbMotsDevines ;	//et le nombre de mots trouvés
+    	imagePerdu.setTouchable(Touchable.disabled) ;
+        Gdx.input.setInputProcessor(stage);
     	
         //On écrit les infos pour le deboggage
         if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + Pendu.score.temps) ;

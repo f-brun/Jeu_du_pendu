@@ -138,7 +138,7 @@ public class EcranGagne implements Screen {
      */
     @Override
     public void dispose() {
-    	jeu.setEcranGagne(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+    	Pendu.setEcranGagne(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
         img.dispose();
         stage.dispose();
      }

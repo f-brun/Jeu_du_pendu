@@ -15,7 +15,6 @@ public class Logger {
 	
 	public Logger() {
 		writer = new BufferedWriter(Gdx.files.local(FICHIER_LOG).writer(true)) ;	//Ouvre le fichier en écriture en mode append
-		
 	}
 	
 	public void ecritLog(int niveau, String joueur,int score, int nbMots, long temps, String dico) {
@@ -29,10 +28,12 @@ public class Logger {
 	}
 	
 	public void fermeture() {
-		try {
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (writer != null) {
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 }

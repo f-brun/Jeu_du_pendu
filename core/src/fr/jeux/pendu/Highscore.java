@@ -13,6 +13,8 @@ public class Highscore {
 	public static final String DELIMITEUR_ENREGISTREMENTS = ";" ;	
 	public static final String CARACTERE_REMPLACEMENT = "_" ;		//Caractere de remplacement si le nom du joueur contient le délimiteur
 	public static final int LONGUEUR_MAX_NOM_JOUEUR = 15 ;		//Nombre max de caracteres dans le nom du joueur
+    static final int[] ELEMENTS_SCORES = {Score.NO_NIVEAU, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS, Score.NOM_DICTIONNAIRE } ;	//2léments de score à enregistrer
+
 	
 	private BufferedWriter	writer ;
 	private BufferedReader	reader ;
@@ -60,7 +62,7 @@ public class Highscore {
 						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu",				//Nom du joueur
 						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,	//Score
 						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,	//Nb de mots devinnes
-						(chaineDecoupee.hasMoreTokens()) ? Long.parseLong(chaineDecoupee.nextToken()) : 999999,	//Temps de jeu
+						(chaineDecoupee.hasMoreTokens()) ? Integer.parseInt(chaineDecoupee.nextToken()) : 0,	//Temps de jeu
 						(chaineDecoupee.hasMoreTokens()) ? chaineDecoupee.nextToken() : "Inconnu") ;			//Dictionnaire
 					nbScoresLus++ ;
 				}
@@ -85,10 +87,10 @@ public class Highscore {
 
 		//Fabrique la ligne a insérer dans le fichier de highscore
 		String ligne = "" ;
-		for (int i = 0 ; i < Score.NOM_ITEMS_SCORE.length-1 ; i++) {
-			ligne += score.getStringItemScore(i) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
+		for (int i = 0 ; i < ELEMENTS_SCORES.length-1 ; i++) {
+			ligne += score.getStringItemScore(ELEMENTS_SCORES[i]) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
 		}
-		ligne += score.getStringItemScore(Score.NOM_ITEMS_SCORE.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
+		ligne += score.getStringItemScore(ELEMENTS_SCORES.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
 		
 		try {
 			writer.write(ligne);
@@ -119,9 +121,9 @@ public class Highscore {
 			//Fabrique la ligne a insérer dans le fichier de highscore
 			ligne = "" ;
 			for (int j = 0 ; j < Score.NOM_ITEMS_SCORE.length-1 ; j++) {
-				ligne += score.getStringItemScore(j) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
+				ligne += score.getStringItemScore(ELEMENTS_SCORES[j]) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
 			}
-			ligne += score.getStringItemScore(Score.NOM_ITEMS_SCORE.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
+			ligne += score.getStringItemScore(ELEMENTS_SCORES.length) ;	//On rajoute le dernier item sans délimiteur qui suive
 			
 			try {
 				writer.write(ligne);
@@ -145,7 +147,7 @@ public class Highscore {
 		for (i = meilleursScores.length - 1 ; i > 0 ; i--) {	//On part de la fin
 			if ( (score.score > meilleursScores[i].score)
 			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) ) {	//Si le nouveau score est meilleur
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps && score.temps != 0) ) {	//Si le nouveau score est meilleur
 				meilleursScores[i] = meilleursScores[i-1] ;		//On recopie pour decaler les highscores et faire de la place pour ce nouveau record
 			}
 			else if (i > 0) {	//Si ce score est moins bon

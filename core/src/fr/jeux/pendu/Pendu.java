@@ -14,7 +14,7 @@ import fr.jeux.pendu.screens.* ;
 
 public class Pendu extends Game {
 
-    public static boolean DEBUG = false ;
+    public static boolean DEBUG = true ;
     public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
     public static final String POLICE_MOTS = "Consolas.fnt" ;
     public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
@@ -163,24 +163,27 @@ public class Pendu extends Game {
         if (DEBUG) Gdx.app.log("INFO","L'appli se met en pause...") ;
         if (barreMinuteur != null) barreMinuteur.pause() ;
         if (chrono != null) chrono.pause();
+        if (ecranJeu != null && ecranJeu.chronoMot != null) ecranJeu.chronoMot.pause();
     }
 
     public void resume() {
         if (DEBUG) Gdx.app.log("INFO","L'appli sort de pause...") ;
         if (barreMinuteur != null) barreMinuteur.resume() ;
         if (chrono != null) chrono.reprise();
+        if (ecranJeu != null && ecranJeu.chronoMot != null) ecranJeu.chronoMot.reprise();
     }
 
-	public void dispose () {
+	public void dispose() {
         if (DEBUG) Gdx.app.log("INFO","Fermeture - Suppression des references aux objets statiques") ;
-        ecranAccueil = null ;
-        ecranChoixDictionnaire = null ;
-        ecranGagne = null ;
-        ecranJeu = null ;
-        ecranPerdu = null ;
-        ecranReglages = null ;
-        ecranHighscores = null ;
+        if (ecranAccueil != null) ecranAccueil.dispose() ;
+        if (ecranChoixDictionnaire != null) ecranChoixDictionnaire.dispose() ;
+        if (ecranGagne != null) ecranGagne.dispose() ;
+        if (ecranJeu != null) ecranJeu.dispose() ;
+        if (ecranPerdu != null) ecranPerdu.dispose() ;
+        if (ecranReglages != null) ecranReglages.dispose() ;
+        if (ecranHighscores != null) ecranHighscores.dispose() ;
         if (DEBUG) Gdx.app.log("INFO","Fermeture - fermeture du fichier de log") ;
         if (logger != null) logger.fermeture();
+        Gdx.app.exit();
 	}
 }

@@ -23,7 +23,7 @@ public class EcranAccueil implements Screen {
     public Stage stage ;
     public Table tMenu ;  //Table contenant le menu
 
-    protected TextButton boutonJeu, boutonReglages, boutonHighscores ;
+    protected TextButton boutonJeu, boutonReglages, boutonHighscores, boutonQuitter ;
     protected Label titre;
     protected Image imageTitre;
 
@@ -34,8 +34,12 @@ public class EcranAccueil implements Screen {
     public EcranAccueil(Pendu jeuEnCours) {
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
     	
-    	jeu.setEcranAccueil(this) ; 	//Enregistre la référence de cet écran
+    	Pendu.setEcranAccueil(this) ; 	//Enregistre la référence de cet écran
     	
+    	creeUI() ;
+    }
+
+    public void creeUI() {
         stage = new Stage(new ScreenViewport());
 
         Gdx.input.setInputProcessor(stage);
@@ -50,6 +54,7 @@ public class EcranAccueil implements Screen {
         boutonJeu = new TextButton("Jouer", Pendu.getSkin());
         boutonReglages = new TextButton("Reglages", Pendu.getSkin());
         boutonHighscores = new TextButton("Highscores", Pendu.getSkin());
+        boutonQuitter = new TextButton("Quitter",Pendu.getSkin()) ;
         
         img = Pendu.getImagesPendu()[Pendu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
         imageTitre = new Image(img);
@@ -62,6 +67,8 @@ public class EcranAccueil implements Screen {
         tMenu.add(boutonReglages).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
         tMenu.add(boutonHighscores).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        tMenu.row();
+        tMenu.add(boutonQuitter).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
         tMenu.add(imageTitre);
 
@@ -105,9 +112,17 @@ public class EcranAccueil implements Screen {
                	}
             }
         } ) ;
+        
+       boutonQuitter.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor acteur) {
+               	if (Pendu.DEBUG) Gdx.app.log("INFO", "Appuie sur le bouton quitter - fin du programme") ;
+               	jeu.dispose() ;
+            }
+        } ) ;
 
     }
-
+    
+    
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.8f, 1);
