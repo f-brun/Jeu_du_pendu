@@ -1,6 +1,7 @@
 package fr.jeux.pendu.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -29,11 +30,11 @@ public class EcranHighscores implements Screen {
 
     static final int[] COL_HIGHSCORES = {0, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS_HMS } ;
     static final String[] NOMS_COL = {"Rang", "Nom", "Score", "Mots", "Temps"} ;
-    static final int[][] TAILLES_COLONNES = { {30,80}, {120,800}, {40,160}, {40,100}, {50,180} } ;	//Largeurs min et max des colonnes
+    static final int[][] TAILLES_COLONNES = { {30,80}, {100,800}, {35,160}, {35,100}, {45,180} } ;	//Largeurs min et max des colonnes
     static final int ESPACEMENT_COLONNES = 10 ;		//Espacement entre les colonnes
      	
    	static final int[] ALIGNEMENTS_COL_HIGHSCORES = {Align.right, Align.left, Align.center, Align.center, Align.center} ;
-    static final float[] LARGEUR_COLONNES_HIGHSCORES = {10f,40f,15f,15f,15f} ;	//Largeurs des colonnes de highscore en %
+    static final float[] LARGEUR_COLONNES_HIGHSCORES = {10f,40f,15f,15f,20f} ;	//Largeurs des colonnes de highscore en %
     static final float LARGEUR_MAX_HIGHSCORES = 0.95f ;		//Largeur maxi des highscores en % de la fenêtre
     static final float COEF_HIGHSCORES = 0.85f ;
     static final float COEF_SCORE_JOUEUR = 1.2f ;
@@ -54,12 +55,11 @@ public class EcranHighscores implements Screen {
     
     private static TextButton boutonRetour = null ;
     
-    public DetectionSwipe detectionSwipe = null ;
-
-    
     Cell<Label>	celluleTexteATrouver ;
 
-    Pendu jeu ;	//référence aux données du jeu
+	public DetectionSwipe detectionSwipe = null ;
+
+	Pendu jeu ;	//référence aux données du jeu
     
     public EcranHighscores(Pendu jeuEnCours) {
 
@@ -68,10 +68,8 @@ public class EcranHighscores implements Screen {
     	if (Pendu.getEcranHighscores() == null) Pendu.setEcranHighscores(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
-    	
-    	detectionSwipe = new DetectionSwipe() ;
-    	Gdx.input.setInputProcessor(new GestureDetector(detectionSwipe)) ;
-    }
+
+	}
     
     @SuppressWarnings("unchecked")
 	private void creeUI() {
@@ -151,7 +149,7 @@ public class EcranHighscores implements Screen {
     	}
     }
     
-    private void actualiseUI() {
+    public void actualiseUI() {
     	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
     	
     	lTitre.setText("Meilleurs scores\n"+Pendu.highscores.getHighscoreActuel().getNiveau().getDenomination()) ;
@@ -220,9 +218,17 @@ public class EcranHighscores implements Screen {
 
     @Override
     public void show() {
+    	InputMultiplexer im ;
+
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranHighscores - show");
-        Gdx.input.setInputProcessor(stage);
-        
+
+		detectionSwipe = new DetectionSwipe() ;
+
+		im = new InputMultiplexer() ;
+		im.addProcessor(detectionSwipe);
+		im.addProcessor(stage);
+		Gdx.input.setInputProcessor(im) ;
+
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
     }

@@ -74,7 +74,7 @@ public class Pendu extends Game {
    new Niveau("Niveau 4",  true, false, 40f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, 0}}	 ,  9, new int[] {0,1,2,3,4,5,6,7,9,11}, new int[] {4,4}) ,
    new Niveau("Niveau 5",  true,  true, 30f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  7, new int[] {0,2,3,5,6,7,9,11}, new int[] {5,5}) ,
    new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11}, new int[] {6,6})    } ;
-    
+
     public void create() {
         dictionnaires = new Dictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
         dictionnaires.setDictionnaire(0);		//Initialisation du premier dictionnaire
@@ -102,7 +102,7 @@ public class Pendu extends Game {
         logger = new Logger() ; //Pour enregistrer les bilans des parties
         highscores = new Highscores(niveaux,dictionnaires.getNomsDictionnaires()) ;
         position = -1 ;		//Avant de jouer on n'est pas place dans la liste des highscores
-        
+
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
 

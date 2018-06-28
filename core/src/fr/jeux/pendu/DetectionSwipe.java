@@ -2,64 +2,42 @@ package fr.jeux.pendu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Vector2;
 
-public class DetectionSwipe implements GestureDetector.GestureListener {
+public class DetectionSwipe extends GestureDetector {
 
-	@Override
-	public boolean fling(float velocityX, float velocityY, int button) {
-		String message = "Fling performed, velocity:" + Float.toString(velocityX) +
-				"," + Float.toString(velocityY);
-		Gdx.app.log("INFO", message);
-		return true;
+	public static final int VELOCITE_LIMITE = 1000 ;
+
+	public DetectionSwipe() {
+		super(new DirectionGestureListener());
 	}
 
-	@Override
-	public boolean touchDown(float x, float y, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	private static class DirectionGestureListener extends GestureAdapter{
+		private String message ;
 
-	@Override
-	public boolean tap(float x, float y, int count, int button) {
-		// TODO Auto-generated method stub
-		return false;
+		@Override
+		public boolean fling(float velocityX, float velocityY, int button) {
+			if(Math.abs(velocityX)>Math.abs(velocityY)){
+                int direction = 0 ;
+				if(velocityX>VELOCITE_LIMITE) {
+				    direction = -1 ;
+                }
+				else if ((velocityX < (-VELOCITE_LIMITE))) {
+				    direction = +1 ;
+                }
+				else return true ;	//Si c'est trop lent, on ne change rien
+				int noNiveau = (Pendu.getNiveau().getNumero()+direction)%Pendu.niveaux.length ;
+				if (noNiveau < 0 ) noNiveau = Pendu.niveaux.length - 1 ;
+                Pendu.niveau = Pendu.niveaux[noNiveau] ;  //Passe au niveau suivant ou reboucle
+                Pendu.ecranHighscores.actualiseUI() ;   //Et on actualise le contenu
+            }
+			return true;
+		}
+/*		@Override
+		public boolean pan(float x, float y, float deltaX, float deltaY) {
+			message = "Pan performed, delta:" + Float.toString(deltaX) +
+					"," + Float.toString(deltaY);
+			Gdx.app.log("INFO", message);
+			return true;
+		}*/
 	}
-
-	@Override
-	public boolean longPress(float x, float y) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean pan(float x, float y, float deltaX, float deltaY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean panStop(float x, float y, int pointer, int button) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean zoom(float initialDistance, float distance) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void pinchStop() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
