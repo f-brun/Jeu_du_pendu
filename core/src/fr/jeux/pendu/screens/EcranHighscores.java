@@ -15,9 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.input.GestureDetector;
-
 import fr.jeux.pendu.DetectionSwipe;
+import fr.jeux.pendu.GestionClavier;
+import fr.jeux.pendu.GestionClavier.EcouteClavier;
 import fr.jeux.pendu.Highscore;
 import fr.jeux.pendu.Pendu;
 import fr.jeux.pendu.Score;
@@ -129,18 +129,14 @@ public class EcranHighscores implements Screen {
         
         boutonRetour = new TextButton("Retour", Pendu.getSkin());
         boutonRetour.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor acteur) {
-            	if (Pendu.getEcranAccueil() == null ) Pendu.setEcranAccueil(new EcranAccueil(jeu));
-            	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'ecran d'accueil
-            }
+            public void changed(ChangeEvent event, Actor acteur) { Pendu.getEcranHighscores().retourAccueil(); }
         } ) ;
         table.row() ;
         table.add(boutonRetour).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
     	
     }
 
-   
-    public void RetourMenu() {
+    public void retourAccueil() {
     	if (Pendu.getEcranAccueil() != null) {
     		jeu.setScreen(Pendu.getEcranAccueil());	//Bascule sur l'écran d'accueil
     	}
@@ -227,6 +223,11 @@ public class EcranHighscores implements Screen {
 		im = new InputMultiplexer() ;
 		im.addProcessor(detectionSwipe);
 		im.addProcessor(stage);
+		im.addProcessor(new GestionClavier(new EcouteClavier(){
+			public void toucheGAUCHE() { DetectionSwipe.DirectionGestureListener.changeNiveau(-1) ; } ;
+			public void toucheDROITE() { DetectionSwipe.DirectionGestureListener.changeNiveau(1) ; } ;
+		    public void toucheESCAPE() { Pendu.getEcranHighscores().retourAccueil(); } ; 
+		}));
 		Gdx.input.setInputProcessor(im) ;
 
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage

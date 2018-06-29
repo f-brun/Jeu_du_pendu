@@ -1,6 +1,7 @@
 package fr.jeux.pendu.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -11,10 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu;
+import fr.jeux.pendu.GestionClavier.EcouteClavier;
 
 public class EcranReglages implements Screen {
 
@@ -88,14 +92,7 @@ public class EcranReglages implements Screen {
 
         
         boutonRetour = new TextButton("Retour", Pendu.getSkin());
-        boutonRetour.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor acteur) {
-            	if (Pendu.getEcranAccueil() == null ) {
-            		Pendu.setEcranAccueil(new EcranAccueil(jeu));
-            	}
-            	else jeu.setScreen(Pendu.getEcranAccueil());	//Retourne sur l'ecran d'accueil
-            }
-        } ) ;
+        boutonRetour.addListener(new ChangeListener() { public void changed(ChangeEvent event, Actor acteur) { Pendu.getEcranReglages().retourAccueil() ; }}) ;
         table.row() ;
         table.add(boutonRetour).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         
@@ -105,10 +102,18 @@ public class EcranReglages implements Screen {
 
         table.row() ;
         celluleLangueChoisie = table.add(langueChoisie).align(Align.center).width(Pendu.getLargeurEcran()) ;
-    
-        
     }
 
+    public void retourAccueil() {
+    	if (Pendu.getEcranAccueil() != null) {
+    		jeu.setScreen(Pendu.getEcranAccueil());	//Bascule sur l'écran d'accueil
+    	}
+    	else {
+    		jeu.setScreen(new EcranAccueil(jeu));	//Bascule sur l'écran d'accueil
+    	}
+    }
+    
+    
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.8f, 1);
@@ -129,8 +134,19 @@ public class EcranReglages implements Screen {
 
     @Override
     public void show() {
+    	InputMultiplexer im ;
+    	
         if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranReglages - show");
-        Gdx.input.setInputProcessor(stage);
+        
+		im = new InputMultiplexer() ;
+		im.addProcessor(stage);
+		im.addProcessor(new GestionClavier(new EcouteClavier(){
+			public void toucheGAUCHE() { } ;
+			public void toucheDROITE() { } ;
+		    public void toucheESCAPE() { Pendu.getEcranReglages().retourAccueil() ; } ; 
+		}));
+		Gdx.input.setInputProcessor(im) ;
+
         listeNiveaux.setSelectedIndex(Pendu.getNiveau().getNumero()); 	//On se positionne sur le niveau actuel
         langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()) ;
     }

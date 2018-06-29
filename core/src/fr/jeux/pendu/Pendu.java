@@ -173,6 +173,11 @@ public class Pendu extends Game {
         if (ecranJeu != null && ecranJeu.chronoMot != null) ecranJeu.chronoMot.reprise();
     }
 
+    public void quitter() {
+    	this.dispose() ;
+        Gdx.app.exit();
+    }
+    
 	public void dispose() {
         if (DEBUG) Gdx.app.log("INFO","Fermeture - Suppression des references aux objets statiques") ;
         if (ecranAccueil != null) ecranAccueil.dispose() ;
@@ -184,6 +189,5 @@ public class Pendu extends Game {
         if (ecranHighscores != null) ecranHighscores.dispose() ;
         if (DEBUG) Gdx.app.log("INFO","Fermeture - fermeture du fichier de log") ;
         if (logger != null) logger.fermeture();
-        Gdx.app.exit();
 	}
 }

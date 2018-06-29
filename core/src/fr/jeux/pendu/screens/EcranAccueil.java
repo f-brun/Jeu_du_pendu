@@ -1,11 +1,13 @@
 package fr.jeux.pendu.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -13,12 +15,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu ;
+import fr.jeux.pendu.GestionClavier.EcouteClavier;
 
 public class EcranAccueil implements Screen {
 	
     public static final float[][] TAILLES_POLICE_ADAPTEES = {{600, 400,  300,  200,  100,    0},
 															 {  3,   2, 1.5f,   1f, 0.5f, 0.3f}};
+    public static final float ESPACEMENT_BOUTONS = 15 ;
+    public static final float HAUTEUR_UI = 600 ;
 
     public Stage stage ;
     public Table tMenu ;  //Table contenant le menu
@@ -28,6 +34,7 @@ public class EcranAccueil implements Screen {
     protected Image imageTitre;
 
     Texture img;
+    Cell[]	cellulesUI ;
     
     Pendu jeu ;	//référence aux données du jeu
 	
@@ -50,7 +57,7 @@ public class EcranAccueil implements Screen {
 
         if (Pendu.getDebugState()) tMenu.setDebug(true); // This is optional, but enables debug lines for tables.
 
-        titre = new Label("Jeu du pendu\n", Pendu.getSkin());
+        titre = new Label("Jeu du pendu", Pendu.getSkin());
         boutonJeu = new TextButton("Jouer", Pendu.getSkin());
         boutonReglages = new TextButton("Reglages", Pendu.getSkin());
         boutonHighscores = new TextButton("Highscores", Pendu.getSkin());
@@ -59,16 +66,16 @@ public class EcranAccueil implements Screen {
         img = Pendu.getImagesPendu()[Pendu.getImagesPendu().length-1] ;	//Dernière image de pendu (complétement pendu)
         imageTitre = new Image(img);
 
-        tMenu.pad(3);
-        tMenu.add(titre);
+        cellulesUI = new Cell[5] ;	//Déclare 5 cellules pour l'écran
+        cellulesUI[0] = tMenu.add(titre) ;
         tMenu.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        tMenu.add(boutonJeu).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        cellulesUI[1] = tMenu.add(boutonJeu).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         tMenu.row();
-        tMenu.add(boutonReglages).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        cellulesUI[2] = tMenu.add(boutonReglages).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         tMenu.row();
-        tMenu.add(boutonHighscores).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        cellulesUI[3] = tMenu.add(boutonHighscores).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS) ;
         tMenu.row();
-        tMenu.add(boutonQuitter).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
+        cellulesUI[4] = tMenu.add(boutonQuitter).minHeight(Pendu.HAUTEUR_MIN_BOUTONS).maxHeight(Pendu.HAUTEUR_MAX_BOUTONS);
         tMenu.row();
         tMenu.add(imageTitre);
 
@@ -115,8 +122,8 @@ public class EcranAccueil implements Screen {
         
        boutonQuitter.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
-               	if (Pendu.DEBUG) Gdx.app.log("INFO", "Appuie sur le bouton quitter - fin du programme") ;
-               	jeu.dispose() ;
+               	if (Pendu.DEBUG) Gdx.app.log("INFO", "Appui sur le bouton quitter - fin du programme") ;
+               	jeu.quitter() ;
             }
         } ) ;
 
@@ -136,15 +143,28 @@ public class EcranAccueil implements Screen {
     	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
     	titre.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
+
+    	//On redimensionne l'espace entre les boutons
+		for (int i = 0 ; i < cellulesUI.length ; i++) cellulesUI[i].space(ESPACEMENT_BOUTONS*((float)Pendu.getHauteurEcran()/HAUTEUR_UI)) ;
+		
         stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
+    	InputMultiplexer im ;
+
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranAccueil - show");
     	Pendu.position = -1 ;	//Remet à -1 la position dans les highscores avant une nouvelle partie
-        Gdx.input.setInputProcessor(stage);
-
+    	
+		im = new InputMultiplexer() ;
+		im.addProcessor(stage);
+		im.addProcessor(new GestionClavier(new EcouteClavier(){
+			public void toucheGAUCHE() { } ;
+			public void toucheDROITE() { } ;
+		    public void toucheESCAPE() { if (Pendu.getDebugState()) Gdx.app.log("INFO","Sortie du programme par touche Esc ou Back"); jeu.quitter() ; } ; 
+		}));
+		Gdx.input.setInputProcessor(im) ;
     }
 
     @Override

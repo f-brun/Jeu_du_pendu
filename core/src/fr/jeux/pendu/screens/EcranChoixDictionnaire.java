@@ -1,7 +1,8 @@
 package fr.jeux.pendu.screens;
 
 	import com.badlogic.gdx.Gdx;
-	import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Screen;
 	import com.badlogic.gdx.graphics.GL20;
 	import com.badlogic.gdx.scenes.scene2d.Actor;
 	import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -13,7 +14,9 @@ package fr.jeux.pendu.screens;
 	import com.badlogic.gdx.utils.Align;
 	import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-	import fr.jeux.pendu.Pendu;
+import fr.jeux.pendu.GestionClavier;
+import fr.jeux.pendu.Pendu;
+import fr.jeux.pendu.GestionClavier.EcouteClavier;
 
 	public class EcranChoixDictionnaire implements Screen{
 
@@ -85,14 +88,16 @@ package fr.jeux.pendu.screens;
 	        celluleLangueChoisie = table.add(langueChoisie).align(Align.center).width(Pendu.getLargeurEcran()) ;
 	    
 	        boutonRetour.addListener(new ChangeListener() {
-	            public void changed(ChangeEvent event, Actor acteur) {
-	                if (Pendu.getEcranReglages() == null) {
-	                	jeu.setScreen(new EcranReglages(jeu));
-	                }
-	                else jeu.setScreen(Pendu.getEcranReglages());	//Retourne sur l'écran des réglages
-	            }
+	            public void changed(ChangeEvent event, Actor acteur) { Pendu.getEcranChoixDictionnaire().retourReglages() ; }
 	        } ) ;
 	        
+	    }
+	    
+	    public void retourReglages() {
+            if (Pendu.getEcranReglages() == null) {
+            	jeu.setScreen(new EcranReglages(jeu));
+            }
+            else jeu.setScreen(Pendu.getEcranReglages());	//Retourne sur l'écran des réglages
 	    }
 
 	    @Override
@@ -115,9 +120,18 @@ package fr.jeux.pendu.screens;
 
 	    @Override
 	    public void show() {
+	    	InputMultiplexer im ;
+	    	
 	        if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranChoixDictionnaire - show");
-	        Gdx.input.setInputProcessor(stage);
 
+			im = new InputMultiplexer() ;
+			im.addProcessor(stage);
+			im.addProcessor(new GestionClavier(new EcouteClavier(){
+				public void toucheGAUCHE() { } ;
+				public void toucheDROITE() { } ;
+			    public void toucheESCAPE() { Pendu.getEcranChoixDictionnaire().retourReglages() ; } ; 
+			}));
+			Gdx.input.setInputProcessor(im) ;
 	    }
 
 	    @Override
