@@ -297,13 +297,14 @@ public class EcranJeu implements Screen {
     @Override
     public void dispose() {
         if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran de jeu") ;
-    	//Elimine d'abord les références aux objets de l'ï¿½cran
+    	//Elimine d'abord les références aux objets de l'écran
     	Pendu.lMotDevine = Pendu.lNbEssaisRestants = Pendu.lNbMotsDevines = null ;
     	//Puis la référence à l'écran lui-même
     	jeu.setEcranJeu(null) ;
+
         if (Pendu.DEBUG) Gdx.app.log("INFO","Destruction de la texture et du stage") ;
-    	img.dispose();
-    	stage.dispose();
+    	if (img != null) img.dispose();
+    	if (stage != null) stage.dispose();
     }
     
 }

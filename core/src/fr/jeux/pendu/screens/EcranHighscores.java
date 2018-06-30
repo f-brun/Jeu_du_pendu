@@ -30,15 +30,21 @@ public class EcranHighscores implements Screen {
 
     static final int[] COL_HIGHSCORES = {0, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS_HMS } ;
     static final String[] NOMS_COL = {"Rang", "Nom", "Score", "Mots", "Temps"} ;
-    static final int[][] TAILLES_COLONNES = { {30,80}, {100,800}, {35,160}, {35,100}, {45,180} } ;	//Largeurs min et max des colonnes
+    static final int[][] TAILLES_COLONNES = { {20,80}, {70,800}, {30,160}, {20,100}, {35,180} } ;	//Largeurs min et max des colonnes
     static final int ESPACEMENT_COLONNES = 10 ;		//Espacement entre les colonnes
      	
    	static final int[] ALIGNEMENTS_COL_HIGHSCORES = {Align.right, Align.left, Align.center, Align.center, Align.center} ;
-    static final float[] LARGEUR_COLONNES_HIGHSCORES = {10f,40f,15f,15f,20f} ;	//Largeurs des colonnes de highscore en %
+    static final float[] LARGEUR_COLONNES_HIGHSCORES = {8f,40f,15f,12f,15f} ;	//Largeurs des colonnes de highscore en %
     static final float LARGEUR_MAX_HIGHSCORES = 0.95f ;		//Largeur maxi des highscores en % de la fenêtre
     static final float COEF_HIGHSCORES = 0.85f ;
     static final float COEF_SCORE_JOUEUR = 1.2f ;
-    
+
+    //Ces variables servent de communication avec les autres ecrans pour savoir quelles informations afficher
+    public static int	noNiveauAAfficher ;
+    public static int	noDicoHighscore ;
+
+
+
     private static Stage stage = null ;
     private static Table table = null ;  //Table contenant l'UI
     
@@ -51,10 +57,11 @@ public class EcranHighscores implements Screen {
     private static Label[][] lScores = null ;	//Labels contenant les informations sur les highscores
     private static Cell<Label>[][]	clScores	= null ;
     private static Cell<ScrollPane> celluleTable = null ;
-    
-    
+
     private static TextButton boutonRetour = null ;
-    
+
+	public static Score[] highscore ;	//Stocke les scores a afficher
+
     Cell<Label>	celluleTexteATrouver ;
 
 	public DetectionSwipe detectionSwipe = null ;
@@ -73,7 +80,7 @@ public class EcranHighscores implements Screen {
     
     @SuppressWarnings("unchecked")
 	private void creeUI() {
-    	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
+    	highscore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
 
     	
        	stage = new Stage(new ScreenViewport());
@@ -109,13 +116,13 @@ public class EcranHighscores implements Screen {
     	lScores = new Label[Highscore.NB_HIGHSCORES_PAR_CATEGORIE][NOMS_COL.length] ;
     	clScores = new Cell[Highscore.NB_HIGHSCORES_PAR_CATEGORIE][NOMS_COL.length] ;
     	
-    	for (int i = 0 ; i < highScore.length ; i++) {
+    	for (int i = 0 ; i < highscore.length ; i++) {
      		tScores.row() ;
     		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
         		if (COL_HIGHSCORES[j] == 0) {			//Si c'est le rang
         			lScores[i][j] = new Label(Integer.toString(i+1), Pendu.getSkin()) ;	//On inscrit l'index +1 pour avoir le numero de rang
         		}
-        		else lScores[i][j] = new Label(highScore[i].getStringItemScore(COL_HIGHSCORES[j]), Pendu.getSkin()) ;
+        		else lScores[i][j] = new Label(highscore[i].getStringItemScore(COL_HIGHSCORES[j]), Pendu.getSkin()) ;
         		lScores[i][j].setAlignment(ALIGNEMENTS_COL_HIGHSCORES[j]);
         		clScores[i][j] = tScores.add(lScores[i][j]) ;
     		}
@@ -146,18 +153,18 @@ public class EcranHighscores implements Screen {
     }
     
     public void actualiseUI() {
-    	Score[] highScore = Pendu.highscores.getHighscoreActuel().getMeilleursScores() ;
+    	highscore = Pendu.highscores.getHighscore(noNiveauAAfficher,noDicoHighscore).getMeilleursScores() ;
     	
-    	lTitre.setText("Meilleurs scores\n"+Pendu.highscores.getHighscoreActuel().getNiveau().getDenomination()) ;
+    	lTitre.setText("Meilleurs scores\n"+Pendu.niveaux[noNiveauAAfficher].getDenomination()) ;
     	
     	//On met à jour le contenu de la table des highscores
-    	for (int i = 0 ; i < highScore.length ; i++) {
+    	for (int i = 0 ; i < highscore.length ; i++) {
     		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
         		if (COL_HIGHSCORES[j] == 0) {			//Si c'est le rang
         			lScores[i][j].setText(Integer.toString(i+1)) ;
         		}
         		else {
-        			lScores[i][j].setText(highScore[i].getStringItemScore(COL_HIGHSCORES[j])) ;
+        			lScores[i][j].setText(highscore[i].getStringItemScore(COL_HIGHSCORES[j])) ;
         		}
     		}
     	}
@@ -183,38 +190,43 @@ public class EcranHighscores implements Screen {
    		for (int j = 0 ; j < NOMS_COL.length ; j++) {
     		lColonnes[j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_HIGHSCORES);	//Adapte la taille de la police à la largeur de l'affichage
     	}
-   		
-   		float positionHighscore = 0 ;	//Position du highscore dans la table
-   		//Redimensionne le texte des scores en mettant la bonne couleur
-   		for (int i = 0 ; i < Pendu.highscores.getHighscoreActuel().getMeilleursScores().length ; i++) {
-     		for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
-        		if (Pendu.position == i) {
-        			positionHighscore = lScores[i][0].getY() ;	//Récupère la position verticale du highscore dans la table
-        			lScores[i][j].setColor(Color.FIREBRICK);
-        			lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_SCORE_JOUEUR);	//Adapte la taille de la police à la hauteur de l'affichage
-        		}
-        		else {
-        			lScores[i][j].setColor(Color.WHITE);
-        			lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_HIGHSCORES);	//Adapte la taille de la police à la hauteur de l'affichage
-        		}
-        		clScores[i][j].prefWidth(Pendu.getLargeurEcran()*LARGEUR_COLONNES_HIGHSCORES[j]/100) ;
-    		}
-    	}
-   		if (Pendu.position != -1) scrollpane.scrollTo(0, positionHighscore, 10, 10); 	//On positionne le scorlling de manière à voir le highscore qu'on vient de réaliser
+
+		dimmensionneTextesHighscores() ;
 
    		tScores.setWidth(Pendu.getLargeurEcran());
    		
-/*    	Gdx.app.log("INFO", "Scrollpane : x="+scrollpane.getScrollX()+" y="+scrollpane.getScrollY()+" larg ="+scrollpane.getWidth()+" haut="+scrollpane.getHeight());
-    	Gdx.app.log("INFO", "Scrollpane : posX="+scrollpane.getX()+" posY="+scrollpane.getY()+" prefW="+scrollpane.getPrefWidth()+" PrefH="+scrollpane.getPrefHeight());
-    	Gdx.app.log("INFO", "ScrollTo : y="+positionHighscore);
-*/
-    	
         stage.getViewport().update(width, height, true);
     }
 
+    public void dimmensionneTextesHighscores() {
+
+		float positionHighscore = 0 ;	//Position du highscore dans la table
+		//Redimensionne le texte des scores en mettant la bonne couleur
+		for (int i = 0 ; i < highscore.length ; i++) {
+			for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
+				if ( (Pendu.position == i) && (Pendu.niveau.getNumero() == noNiveauAAfficher) ) {	//Si le highscore vient d'etre fait (meme niveau et position = -1), on l'affiche en rouge et gros
+					positionHighscore = lScores[i][0].getY() ;	//Récupère la position verticale du highscore dans la table
+					lScores[i][j].setColor(Color.FIREBRICK);
+					lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_SCORE_JOUEUR);	//Adapte la taille de la police à la hauteur de l'affichage
+				}
+				else {
+					lScores[i][j].setColor(Color.WHITE);
+					lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_HIGHSCORES);	//Adapte la taille de la police à la hauteur de l'affichage
+				}
+				clScores[i][j].prefWidth(Pendu.getLargeurEcran()*LARGEUR_COLONNES_HIGHSCORES[j]/100) ;
+			}
+		}
+		if (Pendu.position != -1) scrollpane.scrollTo(0, positionHighscore, 10, 10); 	//On positionne le scorlling de manière à voir le highscore qu'on vient de réaliser
+	}
+
+
     @Override
     public void show() {
-    	InputMultiplexer im ;
+		//On commence par fixer le niveau et le dico pour lequel on veut afficher les highscores
+		noNiveauAAfficher = Pendu.niveau.getNumero() ;
+		noDicoHighscore = Pendu.dictionnaires.getDictionnaireActuel().getNumero() ;
+
+		InputMultiplexer im ;
 
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranHighscores - show");
 

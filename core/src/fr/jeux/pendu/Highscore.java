@@ -158,7 +158,7 @@ public class Highscore {
 		if (i == 0) {	//Si i = 0, il reste a comparer avec le premier 
 			if ( (score.score > meilleursScores[i].score)
 			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) ) {	//Si ce score est meilleur
+			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) && score.temps != 0) {	//Si ce score est meilleur
 				meilleursScores[i] = score ;	//On prend la place du premier (l'ancien premier a déjà été inscrit en 2° position)
 				ecritScores() ;
 				return 0 ;

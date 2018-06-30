@@ -1,6 +1,7 @@
 package fr.jeux.pendu.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu;
 
 public class EcranGagne implements Screen {
@@ -26,40 +28,40 @@ public class EcranGagne implements Screen {
     private static Texture img = null ; 
     private static Image imageGagne = null ;
 
-    public static Pendu jeu ;	//référence aux données du jeu
+    public static Pendu jeu ;	//reference aux donnees du jeu
     
     public EcranGagne(Pendu jeuEnCours) {
 
-    	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
+    	jeu = jeuEnCours ;	//reprend la reference au jeu pour toutes les methodes de la classe
  
-    	if (Pendu.getEcranGagne() == null) Pendu.setEcranGagne(this); 	//Ecrit la référence à l'écran que l'on vient de créer
+    	if (Pendu.getEcranGagne() == null) Pendu.setEcranGagne(this); 	//Ecrit la reference a l'ecran que l'on vient de creer
     	
-    	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
+    	if (stage == null) creeUI() ; //Si c'est le premier appel, on cree l'affichage
     	actualiseUI() ;
     }
     private void creeUI() {
 
        	stage = new Stage(new ScreenViewport());
 
-        Gdx.input.setInputProcessor(stage);		//Met le focus sur notre écran
+        Gdx.input.setInputProcessor(stage);		//Met le focus sur notre ecran
         
         if (Pendu.getDebugState()) {
-            System.out.println("Gagné !");
+            System.out.println("Gagne !");
         }
 
-        //Crée l'affichage du score
+        //Cree l'affichage du score
        	lAffichageScore = new Label("Score : "+ Integer.toString(Pendu.getScore()),Pendu.getSkin()) ;
         
 
-        //Crée le label contenant l'image
+        //Cree le label contenant l'image
        	img = new Texture(Pendu.IMAGE_GAGNE);
        	imageGagne = new Image(img);
 
         table = new Table() ;
 
-        //Définit la disposition de la table
+        //Definit la disposition de la table
         table.pad(3) ;
-        table.setFillParent(true);  //La table occupe tout l'écran
+        table.setFillParent(true);  //La table occupe tout l'ecran
         if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
         table.add(lAffichageScore);
         table.row();
@@ -76,7 +78,7 @@ public class EcranGagne implements Screen {
                 if (Pendu.getEcranJeu() == null) {
                 	Pendu.setEcranJeu(new EcranJeu(EcranGagne.jeu));
                 }
-                else jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'écran de jeu pour avoir un nouveau mot
+                else jeu.setScreen(Pendu.getEcranJeu());	//Bascule sur l'ecran de jeu pour avoir un nouveau mot
             }
         });
         
@@ -103,16 +105,26 @@ public class EcranGagne implements Screen {
     	Pendu.setHauteurEcran(height) ;
     	Pendu.setLargeurEcran(width) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","Redimmensionnement vers "+width+" x "+height);
-   		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
+   		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police a la hauteur de l'affichage
     	stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void show() {
-    	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranGagné - show");
-        Gdx.input.setInputProcessor(stage);
+        InputMultiplexer im ;
+
+    	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranGagne - show");
+
+        im = new InputMultiplexer() ;
+        im.addProcessor(stage);
+        im.addProcessor(new GestionClavier(new GestionClavier.EcouteClavier(){
+            public void toucheGAUCHE() { } ;
+            public void toucheDROITE() { } ;
+            public void toucheESCAPE() { Pendu.getEcranPerdu().retourMenu() ; } ;
+        }));
+        Gdx.input.setInputProcessor(im) ;
         
-    	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
+    	if (stage == null) creeUI() ; //Si c'est le premier appel, on cree l'affichage
     	actualiseUI() ;
     }
 
@@ -133,13 +145,15 @@ public class EcranGagne implements Screen {
 
     
     /**
-     * Elimine les références statiques aux objets car si l'application est relancée juste après être quittée, toutes les références statiques
-     * demeurent alors que les objets (écran, widgets... ) sont eux détruits
+     * Elimine les references statiques aux objets car si l'application est relancee juste apres etre quittee, toutes les references statiques
+     * demeurent alors que les objets (ecran, widgets... ) sont eux detruits
      */
     @Override
     public void dispose() {
-    	Pendu.setEcranGagne(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
-        img.dispose();
-        stage.dispose();
+        if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran gagne") ;
+    	Pendu.setEcranGagne(null) ;	//Supprime la reference a l'ecran pour l'obliger a etre re-cree la prochaine fois
+        if (Pendu.DEBUG) Gdx.app.log("INFO","Destruction de la texture et du stage") ;
+        if (img != null) img.dispose();
+        if (stage != null) stage.dispose();
      }
 }

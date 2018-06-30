@@ -27,10 +27,11 @@ public class DetectionSwipe extends GestureDetector {
 		}
 
 		public static void changeNiveau(int direction) {
-			int noNiveau = (Pendu.getNiveau().getNumero()+direction)%Pendu.niveaux.length ;
+			int noNiveau = (Pendu.getEcranHighscores().noNiveauAAfficher+direction)%Pendu.niveaux.length ;
 			if (noNiveau < 0 ) noNiveau = Pendu.niveaux.length - 1 ;
-            Pendu.niveau = Pendu.niveaux[noNiveau] ;  //Passe au niveau suivant ou reboucle
-            Pendu.ecranHighscores.actualiseUI() ;   //Et on actualise le contenu
+			Pendu.getEcranHighscores().noNiveauAAfficher = noNiveau ;	//Passe au niveau suivant ou reboucle
+            Pendu.ecranHighscores.actualiseUI() ;   					//Et on actualise le contenu
+			Pendu.ecranHighscores.dimmensionneTextesHighscores() ;		//En mettant la bonne couleur
 		}
 		
 	}

@@ -15,4 +15,8 @@ public class Highscores {
 	public Highscore getHighscoreActuel() {
 		return highscores[Pendu.niveau.getNumero()][Pendu.dictionnaires.getDictionnaireActuel().getNumero()] ;
 	}
+
+	public Highscore getHighscore(int noNiveau, int noDico) {
+		return highscores[noNiveau][noDico] ;
+	}
 }

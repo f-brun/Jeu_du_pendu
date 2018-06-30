@@ -3,6 +3,7 @@ package fr.jeux.pendu.screens;
 import static com.badlogic.gdx.utils.Timer.schedule;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Highscore;
 import fr.jeux.pendu.Pendu;
 
@@ -105,10 +107,8 @@ public class EcranPerdu implements Screen {
         
         imagePerdu.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-            	if (Pendu.position == -1) {
-            		Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
-            	}
-            	else Pendu.ecranPerdu.highscoreObtenu() ;
+                if (Pendu.logger != null) Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
+                Pendu.ecranPerdu.retourMenu() ;
             }
         });
     	
@@ -162,17 +162,26 @@ public class EcranPerdu implements Screen {
 
     @Override
     public void show() {
+        InputMultiplexer im ;
+
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranPerdu - show");
        
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
 
     	imagePerdu.setTouchable(Touchable.disabled) ;
-        Gdx.input.setInputProcessor(stage);
+
+        im = new InputMultiplexer() ;
+        im.addProcessor(stage);
+        im.addProcessor(new GestionClavier(new GestionClavier.EcouteClavier(){
+            public void toucheGAUCHE() { } ;
+            public void toucheDROITE() { } ;
+            public void toucheESCAPE() { Pendu.getEcranPerdu().retourMenu() ; } ;
+        }));
+        Gdx.input.setInputProcessor(im) ;
     	
         //On écrit les infos pour le deboggage
         if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + Pendu.score.temps) ;
-        Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log        
         Pendu.position = Pendu.highscores.getHighscoreActuel().insereScore(Pendu.score) ;	//Puis on determine la position dans les highscores
         
         if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.score) ;
@@ -211,13 +220,11 @@ public class EcranPerdu implements Screen {
             	Pendu.score.joueur = saisieNom.getText() ;	//On change le nom du joueur
             	Pendu.highscores.getHighscoreActuel().setHighscore(Pendu.position, Pendu.score) ;	//Inscrit le score dans la table des highscores
             	Pendu.highscores.getHighscoreActuel().ecritScores(); 	//et on sauvegarde les scores
-                Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
+                if (Pendu.logger != null) Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
             	Pendu.ecranPerdu.highscoreObtenu() ;	//puis on bascule sur l'écran des highscores
-            };
+            }
         };
         dialogHighscore.button(boutonOK) ;	//On rajoute le bouton OK
-
-
         dialogHighscore.text(lHighscore) ;	//Le texte d'information
         
         celluleTexteHighscore = dialogHighscore.getContentTable().getCell(lHighscore) ;
@@ -226,8 +233,7 @@ public class EcranPerdu implements Screen {
         dialogHighscore.setMovable(true);
         dialogHighscore.setResizable(true);
         dialogHighscore.setResizeBorder(8);
-        
-        
+
         if (Pendu.getDebugState()) {
         	dialogHighscore.setDebug(true) ; // This is optional, but enables debug lines for tables.
         	dialogHighscore.getContentTable().setDebug(true) ;
@@ -237,7 +243,6 @@ public class EcranPerdu implements Screen {
         dimensionneDialogHighscore() ;
     }
 
-    
     private void dimensionneDialogHighscore() {
         int largDialog = LARGEUR_DIALOG_PREFEREE ;
         int hautDialog = HAUTEUR_DIALOG_PREFEREE ;
@@ -268,7 +273,8 @@ public class EcranPerdu implements Screen {
      */
     @Override
     public void dispose() {
+        if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran perdu") ;
     	Pendu.setEcranPerdu(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
-    	stage.dispose();
+        if (stage != null) stage.dispose();
     }
 }

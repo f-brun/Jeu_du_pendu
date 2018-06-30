@@ -13,7 +13,6 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		Gdx.input.setCatchBackKey(true);	//Capture la touche "back" pour éviter une sortie prématurée du programme et faire les retours arrière dans les écrans
 		initialize(new Pendu(), config);
 	}
     public void onConfigurationChanged (Configuration newConfig) {

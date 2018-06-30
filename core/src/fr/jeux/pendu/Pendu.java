@@ -99,9 +99,11 @@ public class Pendu extends Game {
         
         
         chrono = new Chrono() ;	//Crée une instance de la classe Chrono pour chronometrer la partie
-        logger = new Logger() ; //Pour enregistrer les bilans des parties
+        if (DEBUG) logger = new Logger() ; //Pour enregistrer les bilans des parties
         highscores = new Highscores(niveaux,dictionnaires.getNomsDictionnaires()) ;
         position = -1 ;		//Avant de jouer on n'est pas place dans la liste des highscores
+
+        Gdx.input.setCatchBackKey(true);	//Capture la touche "back" pour éviter une sortie prématurée du programme et faire les retours arrière dans les écrans
 
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
