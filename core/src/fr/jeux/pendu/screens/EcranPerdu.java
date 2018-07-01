@@ -32,6 +32,7 @@ public class EcranPerdu implements Screen {
 
     public static final int LARGEUR_DIALOG_PREFEREE = 600 ;
     public static final int HAUTEUR_DIALOG_PREFEREE = 350 ;
+    public static final float POSITION_Y_DIALOG_HIGHSCORE = 0.9f ;	//Position verticale du dialog des highscores en % de l'écran (afficher en haut pour laisser la place d'afficher le clavier virtuel sur mobile)
     public static final float[][] TAILLES_POLICE_ADAPTEES_DIALOGUE = {{500,  450,  400,  300,  200,  100,    0},
 																	 {   2, 1.8f, 1.5f,   1f, 0.8f, 0.5f, 0.4f}};
 
@@ -230,9 +231,8 @@ public class EcranPerdu implements Screen {
         dialogHighscore.getContentTable().row() ;
         dialogHighscore.getContentTable().add(saisieNom) ;	//Et la zone de saisie du nom du joueur
         dialogHighscore.setMovable(true);
-        dialogHighscore.setResizable(true);
-        dialogHighscore.setResizeBorder(8);
-
+        dialogHighscore.setResizable(false);
+        
         if (Pendu.getDebugState()) {
         	dialogHighscore.setDebug(true) ; // This is optional, but enables debug lines for tables.
         	dialogHighscore.getContentTable().setDebug(true) ;
@@ -250,7 +250,7 @@ public class EcranPerdu implements Screen {
    		lHighscore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Math.min(largDialog, hautDialog*2f),TAILLES_POLICE_ADAPTEES_DIALOGUE));	//Adapte la taille de la police à la hauteur de l'affichage
    		celluleTexteHighscore.width(largDialog-8) ;
 		dialogHighscore.setSize(largDialog,hautDialog) ;
-		dialogHighscore.setPosition((Pendu.getLargeurEcran()-dialogHighscore.getWidth())/2,(Pendu.getHauteurEcran()-dialogHighscore.getHeight())/2);
+		dialogHighscore.setPosition((Pendu.getLargeurEcran()-dialogHighscore.getWidth())/2,((Pendu.getHauteurEcran()-dialogHighscore.getHeight())*POSITION_Y_DIALOG_HIGHSCORE));
     }
 
     @Override
