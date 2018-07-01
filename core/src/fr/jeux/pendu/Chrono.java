@@ -81,7 +81,12 @@ public class Chrono {
 		int duree = (int) (getDuree()/1000) ;	//Recupère la durée en secondes
 		return toHMS(duree) ;
 	}
-	
+	public String getDureeHMSS() {
+		int duree = (int) (getDuree()/1000) ;	//Recupère la durée en secondes
+		if (duree<60) return toHMS(duree) + " s" ;
+		return toHMS(duree) ;
+	}
+
 	
 	/**
 	 * Converti une durée en seconde en une chaine sous la forme H:MM:SS (H peut être supérieur à 24) ou MM:SS ou M:SS ou SS ou S

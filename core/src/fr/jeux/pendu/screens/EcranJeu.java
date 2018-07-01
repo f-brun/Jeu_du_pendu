@@ -38,8 +38,9 @@ public class EcranJeu implements Screen {
     														{   1, 0.8f, 0.7f, 0.5f, 0.3f, 0.2f, 0.1f}};
     public static final float[][] TAILLES_POLICE_INFOS_ADAPTEES = {{800,  600,  400,  300,  200,   100,    0},
     															  {1.5f, 1.2f, 1.0f, 0.8f, 0.5f, 0.2f, 0.1f}};
-    public static final String TEXTE_NOMBRE_DE_MOTS_DEVINES = "Nombre de mots\ndevines :\n" ;
+    public static final String TEXTE_NOMBRE_DE_MOTS_DEVINES = "Mots devines: " ;
     public static final String TEXTE_NB_ESSAIS_RESTANTS = "Nombre d'essais\nrestants :\n" ;
+    public static final String TEXTE_TEMPS_ECOULE = "\n\nTemps: " ;
 	static Pendu jeu ;	//référence aux données du jeu
     
     public Chrono chronoMot ;
@@ -175,7 +176,7 @@ public class EcranJeu implements Screen {
         jeu.score.score += jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent()) ;	//On ajoute des points en fonction de la réussite du joueur
         jeu.nbMotsDevines++ ;
         
-        Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines);
+        Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines+" "+TEXTE_TEMPS_ECOULE+Pendu.chrono.getDureeHMSS()+" ");
         
         //Ici on est obligé de passer par une tâche en parallèle, sinon l'actualisation de l'écran ne se fait pas et on ne pourrait pas voir le mot complété
         Timer.Task affichageGagne; //Contiendra le code ï¿½ exécuter pour afficher l'image de fin après un délai
@@ -214,6 +215,8 @@ public class EcranJeu implements Screen {
         Gdx.gl.glClearColor(0.3f, 0.3f, 0.8f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         jeu.barreMinuteur.miseAJour() ;
+        Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines+" "+TEXTE_TEMPS_ECOULE+Pendu.chrono.getDureeHMSS()+" ");	//Met à jour le label pour refléter le temps écoulé
+        
 
         if ((jeu.getNiveau().getNiveauDeJeu().getMinuteurFaitPerdre()) && (jeu.barreMinuteur.getPercent() == 0) ) {	//Si le temps est écoulé et que cela fait perdre
             Timer.Task perduTempsEcoule ; //Contiendra le code à exécuter pour afficher l'image de fin après un délai

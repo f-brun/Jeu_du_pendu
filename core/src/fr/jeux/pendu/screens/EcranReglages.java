@@ -70,8 +70,9 @@ public class EcranReglages implements Screen {
         	public void changed(ChangeEvent event, Actor acteur) {
                 @SuppressWarnings("unchecked")
 				List<String> liste = (List<String>) acteur ;
-               	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau selectionne, on prend le premier de la liste
+               	if (liste.getSelectedIndex() == -1) liste.setSelectedIndex(0);  	//S'il n'y a pas de niveau sélectionné, on prend le premier de la liste
                	Pendu.niveau = Pendu.niveaux[liste.getSelectedIndex()];
+               	Pendu.config.setValeurCle(Pendu.CLE_NIVEAU, Pendu.niveau.getNumero()) ;	//On inscrit le numéro du niveau sélectionné dans la config
             }
         } );
 
@@ -82,7 +83,7 @@ public class EcranReglages implements Screen {
         boutonDictionnaire.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor acteur) {
                 if (Pendu.getEcranChoixDictionnaire() == null) {
-                	jeu.setScreen(new EcranChoixDictionnaire(jeu));	//cree l'ecran de choix du dictionnaire s'il n'existe pas
+                	jeu.setScreen(new EcranChoixDictionnaire(jeu));	//crée l'ecran de choix du dictionnaire s'il n'existe pas
                 }
                 else jeu.setScreen(Pendu.getEcranChoixDictionnaire());	//Retourne sur l'ï¿½cran d'accueil
             }

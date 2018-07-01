@@ -200,7 +200,7 @@ public class EcranHighscores implements Screen {
 
     public void dimmensionneTextesHighscores() {
 
-		float positionHighscore = 0 ;	//Position du highscore dans la table
+		float positionHighscore = -1 ;	//Position du highscore dans la table
 		//Redimensionne le texte des scores en mettant la bonne couleur
 		for (int i = 0 ; i < highscore.length ; i++) {
 			for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
@@ -216,7 +216,7 @@ public class EcranHighscores implements Screen {
 				clScores[i][j].prefWidth(Pendu.getLargeurEcran()*LARGEUR_COLONNES_HIGHSCORES[j]/100) ;
 			}
 		}
-		if (Pendu.position != -1) scrollpane.scrollTo(0, positionHighscore, 10, 10); 	//On positionne le scorlling de manière à voir le highscore qu'on vient de réaliser
+		if (positionHighscore != -1) scrollpane.scrollTo(0, positionHighscore, 10, 10); 	//On positionne le scrolling de manière à voir le highscore qu'on vient de réaliser
 	}
 
 

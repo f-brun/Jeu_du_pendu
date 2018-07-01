@@ -65,6 +65,7 @@ import fr.jeux.pendu.GestionClavier.EcouteClavier;
                 	index = Integer.parseInt(((TextButton)acteur).getText().toString().substring(1,((TextButton)acteur).getText().toString().indexOf("-")-1)) ;
                 	Pendu.dictionnaires.setDictionnaire(index-1) ; //Et on charge le dictionnaire correspondant
                 	langueChoisie.setText("\nLangue en cours : "+Pendu.dictionnaires.getDictionnaireActuel().getLangue()+ " ("+Pendu.dictionnaires.getDictionnaireActuel().getNbMots()+" mots)");
+                	Pendu.config.setValeurCle(Pendu.CLE_DICTIONNAIRE, index-1) ;
 	            }
 	        } ;
 

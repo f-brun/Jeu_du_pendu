@@ -14,7 +14,7 @@ import fr.jeux.pendu.screens.* ;
 
 public class Pendu extends Game {
 
-    public static boolean DEBUG = true ;
+    public static boolean DEBUG = false ;
     public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
     public static final String POLICE_MOTS = "Consolas.fnt" ;
     public static final float DUREE_AFFICHAGE_GAGNE = 1.5f  ;  //Délai avant d'afficher l'écran de victoire (pour qu'on ai le temps de voir le mot complété)
@@ -22,6 +22,10 @@ public class Pendu extends Game {
     public static final int LARGEUR_MAX_BOUTONS_LETTRES = 160 ; //Largeur maximale des boutons représentant les lettres
     public static final int HAUTEUR_MIN_BOUTONS = 15 ; //Hauteur minimale des boutons
     public static final int HAUTEUR_MAX_BOUTONS = 60 ; //Hauteur maximale des boutons
+	public static final String CLE_DICTIONNAIRE = "NoDictionnaire" ;	//Clés du fichier de configuration
+	public static final String CLE_NIVEAU = "NoNiveau" ;				//Clés du fichier de configuration
+	public static final String CLE_JOUEUR = "Joueur" ;				//Clés du fichier de configuration
+
 
     public static int largeurEcran ;
     public static int hauteurEcran ;
@@ -64,6 +68,7 @@ public class Pendu extends Game {
     public static Dictionnaires	dictionnaires ;			//Dictionnaires du jeu
     public static Score score ;   //score
     public static Logger logger ;	//Objet permettant de logger les parties
+    public static Config config ;	//Informations de configuration persistantes
     public static Highscores highscores ;	//Classe de gestion des highscores
     public static int position ; 	//Position dans la liste des highscores à l'issu du jeu
     public static final Niveau[] niveaux = {
@@ -76,14 +81,16 @@ public class Pendu extends Game {
    new Niveau("Niveau 6",  true,  true, 25f, new float[][] {{0.6f, 0.4f, 0.2f, 0f},{10, 6, 4, 1, -1}}	 ,  5, new int[] {0,2,5,7,9,11}, new int[] {6,6})    } ;
 
     public void create() {
-        dictionnaires = new Dictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
-        dictionnaires.setDictionnaire(0);		//Initialisation du premier dictionnaire
+        config = new Config() ;		//Pour stocker les informations de configuration persistantes
+
+    	dictionnaires = new Dictionnaires(CHEMIN_FICHIERS_DICTIONNAIRES) ;
+        dictionnaires.setDictionnaire(config.getValeurCle(CLE_DICTIONNAIRE, 0));		//Initialisation du dictionnaire (le premier si pas encore configuré)
         
-        niveau = niveaux[0] ;	//Par défaut on commence au premier niveau
+        niveau = niveaux[config.getValeurCle(CLE_NIVEAU, 0)] ;		//On commence au dernier niveau sauvegardé (ou le premier si pas encore configuré)
         niveau.setNbNiveaux(niveaux.length) ;
         
         score = new Score(niveau.getNumero(),dictionnaires.getDictionnaireActuel().langue) ;	//Par défaut on a un score nul
-        score.joueur = "Florent" ;
+        score.joueur = config.getValeurCle(CLE_JOUEUR, "Inconnu") ;	//Le nom du joueur est le dernier rentré (ou inconnu si aucun nom sauvegardé)
 
         largeurEcran = Gdx.graphics.getWidth();
         hauteurEcran = Gdx.graphics.getHeight();
@@ -189,7 +196,9 @@ public class Pendu extends Game {
         if (ecranPerdu != null) ecranPerdu.dispose() ;
         if (ecranReglages != null) ecranReglages.dispose() ;
         if (ecranHighscores != null) ecranHighscores.dispose() ;
-        if (DEBUG) Gdx.app.log("INFO","Fermeture - fermeture du fichier de log") ;
+        if (DEBUG) Gdx.app.log("INFO","Fermeture - Fermeture du fichier de log") ;
         if (logger != null) logger.fermeture();
+        if (DEBUG) Gdx.app.log("INFO","Fermeture - Ecriture des informations du fichier de config") ;
+        if (config != null) config.sauvegarde();       
 	}
 }

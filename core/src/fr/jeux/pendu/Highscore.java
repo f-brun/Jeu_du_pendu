@@ -7,6 +7,11 @@ import java.util.StringTokenizer;
 
 import com.badlogic.gdx.Gdx;
 
+/**
+ * Classe de gestion de highscore permettant la sauvegarde dans un fichier local
+ * @author Florent Brun
+ *
+ */
 public class Highscore {
 	private static final String BASE_FICHIER_HIGHSCORE = "Highscores/Highscore_" ;
 	public static final int NB_HIGHSCORES_PAR_CATEGORIE = 15 ;

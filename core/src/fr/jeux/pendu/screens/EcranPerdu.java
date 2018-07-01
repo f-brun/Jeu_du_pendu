@@ -216,6 +216,7 @@ public class EcranPerdu implements Screen {
             protected void result(Object object)
             {
             	Pendu.score.joueur = saisieNom.getText() ;	//On change le nom du joueur
+            	Pendu.config.setValeurCle(Pendu.CLE_JOUEUR, saisieNom.getText() ) ;		//On enregistre dans la config persistante pour que ça reste pour les parties suivantes
             	Pendu.highscores.getHighscoreActuel().setHighscore(Pendu.position, Pendu.score) ;	//Inscrit le score dans la table des highscores
             	Pendu.highscores.getHighscoreActuel().ecritScores(); 	//et on sauvegarde les scores
                 if (Pendu.logger != null) Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
