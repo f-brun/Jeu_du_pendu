@@ -164,12 +164,10 @@ public class EcranPerdu implements Screen {
     public void show() {
         InputMultiplexer im ;
 
+    	imagePerdu.setTouchable(Touchable.disabled) ;
     	if (Pendu.getDebugState()) Gdx.app.log("INFO","EcranPerdu - show");
-       
     	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
     	actualiseUI() ;
-
-    	imagePerdu.setTouchable(Touchable.disabled) ;
 
         im = new InputMultiplexer() ;
         im.addProcessor(stage);
@@ -192,10 +190,10 @@ public class EcranPerdu implements Screen {
         attenteFinie = new Timer.Task(){
         	@Override
         	public void run() {
-            	imagePerdu.setTouchable(Touchable.enabled) ;
-            	if (Pendu.position >= 0) {
-            		afficheDialogueHighscore() ;
+            	if (Pendu.position >= 0) {			//Si on a un record
+            		afficheDialogueHighscore() ;	//On affiche le dialogue pour récupérer le nom
             	}
+            	else imagePerdu.setTouchable(Touchable.enabled) ;	//Sinon on autorise la sortie de l'écran par l'image
         	}
         } ;
         schedule(attenteFinie,DUREE_AFFICHAGE_PERDU) ;

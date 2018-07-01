@@ -29,12 +29,12 @@ public class EcranHighscores implements Screen {
     								"onzieme", "douzieme", "treizieme", "quatorzieme", "quinzieme", "seizieme", "dix-septieme", "dix-huitieme", "dix-neuvieme", "vingtieme"} ;
 
     static final int[] COL_HIGHSCORES = {0, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS_HMS } ;
-    static final String[] NOMS_COL = {"Rang", "Nom", "Score", "Mots", "Temps"} ;
-    static final int[][] TAILLES_COLONNES = { {20,80}, {70,800}, {30,160}, {20,100}, {35,180} } ;	//Largeurs min et max des colonnes
+    static final String[] NOMS_COL = {"No", "Nom", "Score", "Mots", "Temps"} ;
+    static final int[][] TAILLES_COLONNES = { {13,80}, {80,800}, {25,160}, {20,100}, {35,180} } ;	//Largeurs min et max des colonnes
     static final int ESPACEMENT_COLONNES = 10 ;		//Espacement entre les colonnes
      	
    	static final int[] ALIGNEMENTS_COL_HIGHSCORES = {Align.right, Align.left, Align.center, Align.center, Align.center} ;
-    static final float[] LARGEUR_COLONNES_HIGHSCORES = {8f,40f,15f,12f,15f} ;	//Largeurs des colonnes de highscore en %
+    static final float[] LARGEUR_COLONNES_HIGHSCORES = {7f,50f,11f,10f,15f} ;	//Largeurs des colonnes de highscore en %
     static final float LARGEUR_MAX_HIGHSCORES = 0.95f ;		//Largeur maxi des highscores en % de la fenêtre
     static final float COEF_HIGHSCORES = 0.85f ;
     static final float COEF_SCORE_JOUEUR = 1.2f ;

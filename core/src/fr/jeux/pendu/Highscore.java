@@ -90,7 +90,7 @@ public class Highscore {
 		for (int i = 0 ; i < ELEMENTS_SCORES.length-1 ; i++) {
 			ligne += score.getStringItemScore(ELEMENTS_SCORES[i]) + DELIMITEUR_ENREGISTREMENTS ;	//On ajoute un à un les constituants du score
 		}
-		ligne += score.getStringItemScore(ELEMENTS_SCORES.length-1) ;	//On rajoute le dernier item sans délimiteur qui suive
+		ligne += score.getStringItemScore(ELEMENTS_SCORES.length) ;	//On rajoute le dernier item sans délimiteur qui suive
 		
 		try {
 			writer.write(ligne);
@@ -171,10 +171,17 @@ public class Highscore {
 		else return -1 ;	//Sinon on renvoit -1 pour indiquer qu'on est pas dans les highscores
 	}
 
-	public Score[] getMeilleursScores() { return meilleursScores ; }
+		/**
+		 * Retourne une copie du tableau des highscores
+		 * @return copie du tableau des highscores
+		 */
+	public Score[] getMeilleursScores() {
+		Score[] copieMeilleursScores = new Score[NB_HIGHSCORES_PAR_CATEGORIE] ;
+		for (int i = 0 ; i < meilleursScores.length ; i++) copieMeilleursScores[i] = meilleursScores[i] ;
+		return copieMeilleursScores ; }
 
 	public void setHighscore(int numero, Score score) {
-		meilleursScores[numero] = score ;
+		meilleursScores[numero] = score.copie() ;
 	}
 	
 	public Score getHighscore(int numero) { return meilleursScores[numero] ; }

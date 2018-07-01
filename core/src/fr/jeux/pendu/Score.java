@@ -10,8 +10,8 @@ public class Score {
 	public static final int SCORE = 3 ;
 	public static final int NB_MOTS_DEVINES = 4 ;
 	public static final int TEMPS = 5 ;
-	public static final int TEMPS_HMS = 6 ;
-	public static final int NOM_DICTIONNAIRE = 7 ;
+	public static final int NOM_DICTIONNAIRE = 6 ;
+	public static final int TEMPS_HMS = 7 ;
 	
 	public int	niveau ;
 	public String	joueur ;
@@ -58,5 +58,14 @@ public class Score {
 				Gdx.app.log("ERROR", "Numéro d'item de score non existant : "+noItem);
 				return "" ;
 		}
+	}
+	
+	/**
+	 * Renvoie une copie du score qui possède donc une référence et un espace mémoire propre
+	 * @param original
+	 * @return copie du score
+	 */
+	public Score copie() {
+		return new Score(this.niveau, this.joueur, this.score, this.nbMotsDevines, this.temps, this.dictionnaire) ;
 	}
 }
