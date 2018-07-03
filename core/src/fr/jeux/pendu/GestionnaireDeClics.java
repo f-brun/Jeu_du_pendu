@@ -2,20 +2,24 @@ package fr.jeux.pendu;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import static fr.jeux.pendu.GestionMots.CompleteMotADeviner;
 import static fr.jeux.pendu.GestionMots.SepareParDesEspaces;
+
+
 /**
  *
  * @author Florent
  */
 public class GestionnaireDeClics extends ChangeListener {
-    Config cfg ;
+    Pendu jeu ;	//Référence aux données du jeu
+
+    public GestionnaireDeClics(Pendu jeuEnCours) {
+    	super() ;
+    	jeu = jeuEnCours ;
+    }
     
     @Override
     public void changed(ChangeEvent evenement,Actor acteur) {
@@ -25,25 +29,26 @@ public class GestionnaireDeClics extends ChangeListener {
             bouton = (TextButton) acteur;
             lettreProposee = bouton.getText().toString();
 
-            cfg.lettresProposes += lettreProposee;
-            bouton.setDisabled(true);
+            Pendu.lettresProposes += lettreProposee;
+//            bouton.setDisabled(true);
 
             if (CompleteMotADeviner(lettreProposee)) {
-                cfg.lMotDevine.setText(SepareParDesEspaces(cfg.motDevine));
-                if (cfg.motDevine.equals(cfg.motADeviner)) {    //Vérifie si on a gagné
-                    cfg.lMotDevine.setText(SepareParDesEspaces(cfg.motDevine));
-                    cfg.partie.gagne();
+                Pendu.lMotDevine.setText(SepareParDesEspaces(Pendu.motDevine));
+                if (Pendu.motDevine.equals(Pendu.motADeviner)) {    //Vérifie si on a gagné
+//                    jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));
+                    Pendu.ecranJeu.gagne(jeu);
                 }	
             } else {
-                cfg.nbErreurs++;
-                if (cfg.DEBUG) System.out.println("La lettre " + lettreProposee + " n'est pas dans le mot");
-                if (cfg.DEBUG) System.out.println(cfg.nbErreurs + " erreur(s) jusqu'ici");
-                cfg.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(cfg.imagePendu[cfg.nbErreurs])));
-                if (cfg.nbErreurs >= cfg.nbErreursMax) {	//On a perdu
-                    cfg.partie.perdu();
+                Pendu.nbErreurs++;
+                Pendu.lNbEssaisRestants.setText("Nombre d'essais\nrestants :\n"+(Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax() - Pendu.getNbErreurs())); ;
+                if (Pendu.DEBUG) System.out.println("La lettre " + lettreProposee + " n'est pas dans le mot");
+                if (Pendu.DEBUG) System.out.println(Pendu.getNbErreurs() + " erreur(s) jusqu'ici");
+                Pendu.affichagePendu.setDrawable(new SpriteDrawable(new Sprite(Pendu.getImagesPendu()[Pendu.getNiveau().getNiveauDeJeu().getImagesPendaison()[Pendu.getNbErreurs()]])));
+                if (Pendu.getNbErreurs() >= Pendu.getNiveau().getNiveauDeJeu().getNbErreursMax()) {	//On a perdu
+                    Pendu.ecranJeu.perdu(jeu);
                 }
             }
-            acteur.remove();
+            acteur.setVisible(false) ;	//Fait disparaître la lettre
         }
     }
 }

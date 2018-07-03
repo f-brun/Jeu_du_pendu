@@ -31,6 +31,37 @@ www-test/
 /android/out/
 com_crashlytics_export_strings.xml
 
+##Rajoutés pour éviter d'écraser les paramètres spécifiques à Android Studio
+settings.gradle
+build.gradle
+/android/build.gradle
+
+##Rajouté pour éviter de mettre plein de fichier inutiles dans le repository
+_windows/
+codestyles/
+inspection/
+androidEditors.xml
+androidStudioFirstRun.xml
+debugger.renderers.xml
+debugger.xml
+diff.xml
+editor.codeinsight.xml
+editor.xml
+find.xml
+tithub_settings.xml
+ide.general.xml
+IntelliLang.xml
+jdk.table.xml
+keyboard.xml
+notifications.xml
+plugin_ui.xml
+project.default.xml
+ui.Inf.xml
+vcs.xml
+web-browsers.xml
+./*.xml
+
+
 ## Eclipse
 
 .classpath

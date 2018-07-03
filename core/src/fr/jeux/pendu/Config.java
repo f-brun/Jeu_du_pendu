@@ -1,73 +1,169 @@
 package fr.jeux.pendu;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import com.badlogic.gdx.Gdx;
 /**
+ * Classe de gestion d'informations de configuration persistantes. Les informations sont lues à partir du fichier de configuration lors de la création d'une instance de la classe.
+ * Puis on accède en lecture ou écriture à ces informations et elles sont écrites dans le fichier de config à la fin par l'appel à la méthode sauvegarde().
+ * @author Florent Brun
  *
- * @author Florent
  */
 public class Config {
-    private static Config instance;
-    public static final int LARGEUR_CIBLE = 800 ;   //Largeur de l'écran virtuel cible
-    public static final int HAUTEUR_CIBLE = 600 ;   //Hauteur de l'écran virtuel cible
-    public static boolean DEBUG = false ;
-    public static final int TAILLE_BUFFER = 256*1024 ;   //Taille du buffer de lecture du dictionnaire
-    public static final String CHEMIN_SKIN = "skin/freezing-ui.json" ;
-    public static final String POLICE_MOTS = "Consolas.fnt" ;
-    public static int largeurEcran ;
-    public static int hauteurEcran ;
-    public static BitmapFont policeMots ;
-    public static Label.LabelStyle styleMots ;
-    public static Stage stage ;
-    public static Table tMenu ;  //Table contenant le menu
-    public static Table tPartie ;  //Table contenant la partie
-    public static Table tFin ;  //Table contenant l'écran de fin (gagné ou perdu)
-    public static Skin skin ; //Skin utilisée par l'UI
-    public static Image affichagePendu;  //Elément d'UI contenant l'image du pendu
-    public static Partie partie ; //Instance de la partie en cours
-    public static String motADeviner ;
-    public static String motDevine ;
-    public static Label lMotDevine; //texte du mot à deviner
-    public static String lettresProposes ;
-    public static int nbErreurs ;	//Nombre de mauvaises lettres proposées
-    public static int nbErreursMax ;	//Nombre de mauvaises lettres proposées
-    public static final int NB_IMAGES = 12 ;
-    public static final String IMAGE_GAGNE = "images/gagne.gif" ;   //Image affichée en cas de victoire
-    public static final String IMAGE_PERDU = "images/perdu.jpg" ;   //Image affichée en cas de défaite
-    public static final float ATTENTE_FIN_PARTIE = 8f ;    //Nombre de secondes où on affiche l'image de fin de partie avant de revenir au menu
-    public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
-    public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
-    public static final String PREFIXE_FICHIERS_IMAGES = "pendu" ;	//Préfixe des fichiers représentants le pendu (suivis de xx où xx est le numéro du fichier)
-    public static final String FICHIER_DICTIONNAIRE = "liste_filtree.txt" ; //Fichier contenant les mots à deviner
-    public static String[] listeMots ; // Liste des mots à deviner
-    public static int nombreMotsDico ; //Nombre de mots dans le dictionnaire des mots à deviner
-    public static int score ;   //score = nb de mots devinnés d'affilé
-    
-    Config() {
-    largeurEcran = Gdx.graphics.getWidth();
-    hauteurEcran = Gdx.graphics.getHeight();
-    skin = new Skin(Gdx.files.internal(CHEMIN_SKIN)) ;
-    stage = new Stage(new StretchViewport(LARGEUR_CIBLE,HAUTEUR_CIBLE));
-    partie = null ; //Au début il n'y a pas de partie en cours
-    policeMots = new BitmapFont(Gdx.files.internal(POLICE_MOTS));
-    styleMots = new Label.LabelStyle();
-    styleMots.font = policeMots ;
-    styleMots.fontColor = Color.WHITE;
-    
-    Gdx.input.setInputProcessor(stage);
-    score = 0 ;
-    }
-    public void dispose() {
-        stage.dispose();
-    }
+	
+	private final String NOM_FICHIER_CONFIG = "config" ;	//Nom par défaut du fichier de config
+	public static final String DELIMITEUR = "=" ;	
+	private final int CLE = 0 ;			//Index de la clé dans le tableau de String qui constitue un élément de config
+	private final int VALEUR = 1 ;		//Index de la valeur dans le tableau de String qui constitue un élément de config
+	
+	private ArrayList<String[]> elementsConfig ;
+	private String nomFichierConfig ;
+	private BufferedWriter	writer ;
+	private BufferedReader	reader ;
+
+	/**
+	 * Constructeur sans argument utilisant le nom de fichier de config par défaut
+	 */
+	public Config() {
+		initConfig(NOM_FICHIER_CONFIG) ;
+	}
+
+	/**
+	 * Constructeur demandant le nom du fichier de config. Permet de gérer éventuellement plusieurs fichiers de config simultanément.
+	 * @param nomFichierConfig Nom (et chemin) du fichier de config dans le stockage interne. S'il n'existe pas ou s'il est vide, aucun information ne sera disponible, mais la structure mise en place pour enregistrer de nouvelles informations.
+	 */
+	public Config(String nomFichierConfig) {
+		initConfig(nomFichierConfig) ;
+	}
+	
+	private void initConfig(String nomFichierConfig) {
+		this.nomFichierConfig = nomFichierConfig ;
+		elementsConfig = new ArrayList<String[]>() ;
+		if (Pendu.getDebugState()) Gdx.app.log("INFO", "Lecture du fichier de configuration");
+		litFichierConfig(nomFichierConfig) ;
+	}
+	
+	private void litFichierConfig(String fichier) {
+		try {
+			reader = new BufferedReader(Gdx.files.local(fichier).reader()) ;	//Ouvre le fichier en lecture
+		}
+		catch (Exception e) { reader = null ;}
+		
+		if (reader == null) {
+			Gdx.app.log("ERROR", "Impossible d'ouvrir en lecture le fichier de config : "+fichier);
+			return ;
+		}
+
+		String ligne = null ;
+		do {
+			try {
+				ligne = reader.readLine() ;
+			} catch (IOException e) { e.printStackTrace(); }
+
+			if (ligne != null) {
+				String[] element = new String[2] ;
+				element[CLE] = ligne.substring(0,ligne.indexOf(DELIMITEUR)) ;	//La clé est du début jusqu'au délimiteur
+				element[VALEUR] = ligne.substring(ligne.indexOf(DELIMITEUR)+1,ligne.length()) ;	//La valeur est juste après le délimiteur jusqu'à la fin de la ligne
+				elementsConfig.add(element) ;
+			}
+		} while (ligne != null) ;
+		
+		try { reader.close();} catch (IOException e) {e.printStackTrace();	}
+	}
+	
+	/**
+	 * Sauvegarde la config actuelle
+	 */
+	public void sauvegarde() {
+
+		try {
+			writer = new BufferedWriter(Gdx.files.local(this.nomFichierConfig).writer(false)) ;	//Ouvre le fichier en écriture en mode overwrite
+		}
+		catch  (Exception e) { e.printStackTrace(); writer = null ;}
+			
+		if (writer == null) {
+			Gdx.app.log("ERROR", "Impossible d'ouvrir en ecriture le fichier de config : " + this.nomFichierConfig);
+			return ;
+		}
+
+		String ligne ;						//La ligne à écrire dans le fichier
+		String[] element = new String[2] ;	//L'élément contenant les informations à écrire sur la ligne
+
+		Iterator<String[]> i = elementsConfig.iterator();
+		while(i.hasNext()){
+			  element = (String[]) i.next();
+			  ligne  = element[CLE] + DELIMITEUR + element[VALEUR] ;		//Fabrique la ligne a insérer dans le fichier de config
+			try {
+				writer.write(ligne);
+				writer.newLine();
+			} catch (IOException e) { e.printStackTrace(); }
+		}
+		try {
+			writer.close();
+		} catch (IOException e) {
+			Gdx.app.log("ERROR", "Impossible de fermer le fichier de config : "+ this.nomFichierConfig);
+			e.printStackTrace();
+		}
+	}
+	
+	private String rechercheValeurCle(String cle) {
+		String[] element = new String[2] ;
+		
+		Iterator<String[]> i = elementsConfig.iterator();
+		while(i.hasNext()){									//On parcourt la liste à la recherche de la clé
+			  element =  (String[]) i.next();
+			  if (element[CLE].equals(cle)) return element[VALEUR] ;	//Si on la trouve, on fixe la valeur et on la renvoie à l'appelant
+		}
+		return null ;	//Si on n'a pas trouvé la clé, on renvoie null
+	}
+	
+	/**
+	 * Recupére la valeur d'une clé dans la config actuelle
+	 * @param cle clé dont on veut connaitre la valeur
+	 * @param valeurParDefaut valeur a donner si la clé est introuvable
+	 * @return valeur de la clé dans la config ou valeurParDefaut si la clé n'est pas dans la config
+	 */
+	public int getValeurCle(String cle, int valeurParDefaut) {
+		String valeur = rechercheValeurCle(cle) ;
+		if (valeur == null) return valeurParDefaut ;
+		return Integer.parseInt(valeur) ;
+	}
+	public float getValeurCle(String cle, float valeurParDefaut) {
+		String valeur = rechercheValeurCle(cle) ;
+		if (valeur == null) return valeurParDefaut ;
+		return Float.parseFloat(valeur) ;
+	}
+	public String getValeurCle(String cle, String valeurParDefaut) {
+		String valeur = rechercheValeurCle(cle) ;
+		if (valeur == null) return valeurParDefaut ;
+		return valeur ;
+	}
+	
+	private int getIndexCle(String cle) {
+		for (int i = 0 ; i < elementsConfig.size() ; i++) {
+			if (elementsConfig.get(i)[CLE].equals(cle) ) return i ;
+		}
+		return -1 ;		//On a rien trouvé
+	}
+	
+	public boolean setValeurCle(String cle, String valeur) {
+		String[] element = new String[2] ;
+		element[CLE] = cle ;
+		element[VALEUR] = valeur ;
+		int index = getIndexCle(cle) ;
+		if (index < 0) {
+			elementsConfig.add(element) ;	//On ajoute l'élément à la liste des éléments de config
+			return false ;	//On a pas réussit à trouver la clé - il faut donc la créer
+		}
+		elementsConfig.set(index,element) ;	//Fixe la valeur de l'élément
+		return true ;
+	}
+
+	public boolean setValeurCle(String cle, int valeur) {
+		return setValeurCle(cle, Integer.toString(valeur)) ;
+	}
 }
