@@ -1,7 +1,11 @@
 package fr.jeux.pendu;
 
 import com.badlogic.gdx.input.GestureDetector;
-
+/**
+ * Classe gérant la détection de swipe à droite ou à gauche et faisant le changement de niveau correspondant.
+ * @author Florent Brun
+ *
+ */
 public class DetectionSwipe extends GestureDetector {
 
 	public static final int VELOCITE_LIMITE = 1000 ;

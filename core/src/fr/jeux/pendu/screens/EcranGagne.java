@@ -15,7 +15,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu;
-
+/**
+ * Ecran qui s'affiche lorsque l'on arrive à compléter le mot. Le chrono est suspendu le temps d'afficher le score et l'image d'encouragement.
+ * @author Florent Brun
+ *
+ */
 public class EcranGagne implements Screen {
     public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
     														{   3, 2.5f,   2f, 1.5f,   1f, 0.5f}};

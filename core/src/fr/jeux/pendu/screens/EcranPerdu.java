@@ -25,7 +25,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Highscore;
 import fr.jeux.pendu.Pendu;
-
+/**
+ * Ecran qui s'affiche lorsque l'on a perdu. Affiche la bonne réponse et détermine si le score atteint est dans les highscores.
+ * Si c'est le cas, on affiche un dialogue pour recueillir le nom du joueur et on bascule sur l'écran des highscores. Sinon on revient à l'écran d'accueil 
+ * @author Florent Brun
+ *
+ */
 public class EcranPerdu implements Screen {
     public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
 			 												{   3, 2.5f,   2f, 1.5f,   1f, 0.5f}};
@@ -108,7 +113,8 @@ public class EcranPerdu implements Screen {
         
         imagePerdu.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                if (Pendu.logger != null) Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
+                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.niveau + ";Joueur:" + Pendu.score.joueur + ";Score:" + Pendu.score.score + ";Mots devines:" + Pendu.score.nbMotsDevines
+                		+ ";Temps:" + Pendu.score.temps + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
                 Pendu.ecranPerdu.retourMenu() ;
             }
         });
@@ -220,7 +226,9 @@ public class EcranPerdu implements Screen {
             	Pendu.config.setValeurCle(Pendu.CLE_JOUEUR, saisieNom.getText() ) ;		//On enregistre dans la config persistante pour que ça reste pour les parties suivantes
             	Pendu.highscores.getHighscoreActuel().setHighscore(Pendu.position, Pendu.score) ;	//Inscrit le score dans la table des highscores
             	Pendu.highscores.getHighscoreActuel().ecritScores(); 	//et on sauvegarde les scores
-                if (Pendu.logger != null) Pendu.logger.ecritLog(Pendu.score.niveau, Pendu.score.joueur, Pendu.score.score, Pendu.score.nbMotsDevines, Pendu.score.temps, Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
+                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.niveau + ";Joueur:" + Pendu.score.joueur + ";Score:" + Pendu.score.score + ";Mots devines:" + Pendu.score.nbMotsDevines
+                		+ ";Temps:" + Pendu.score.temps + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
+                Pendu.ecranPerdu.retourMenu() ;
             	Pendu.ecranPerdu.highscoreObtenu() ;	//puis on bascule sur l'écran des highscores
             }
         };

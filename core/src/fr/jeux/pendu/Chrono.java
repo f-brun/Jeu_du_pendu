@@ -1,5 +1,10 @@
 package fr.jeux.pendu;
 
+/**
+ * Chronomètre au millième de seconde basé sur l'horloge interne ( System.currentTimeMillis() ) avec des fonctions de pause/reprise et d'affichage de la durée écoulée sous forme texte. 
+ * @author Florent Brun
+ *
+ */
 public class Chrono {
 
 	private long tempsDebut ;

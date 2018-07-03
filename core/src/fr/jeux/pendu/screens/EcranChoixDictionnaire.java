@@ -17,7 +17,11 @@ import com.badlogic.gdx.Screen;
 import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu;
 import fr.jeux.pendu.GestionClavier.EcouteClavier;
-
+/**
+ * Ecran de choix de la liste de mot ("dictionnaire") a utiliser.
+ * @author Florent Brun
+ *
+ */
 	public class EcranChoixDictionnaire implements Screen{
 
 	    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},

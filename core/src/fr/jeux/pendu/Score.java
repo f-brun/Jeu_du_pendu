@@ -2,8 +2,13 @@ package fr.jeux.pendu;
 
 import com.badlogic.gdx.Gdx;
 
+/**
+ * Classe de gestion du score. Chaque instance stocke l'ensemble des informations liées à un score (nom du joueur, durée de la partie, niveau, ...)
+ * @author Florent Brun
+ *
+ */
 public class Score {
-	
+	//Constantes servant à décrire le contenu de la classe (les informations stockées)
 	public static final String[] NOM_ITEMS_SCORE = {"Niveau", "Nom", "Score", "Mots", "Temps", "Dictionnaire" } ;
 	public static final int NO_NIVEAU = 1 ;
 	public static final int NOM_JOUEUR = 2 ;
@@ -13,6 +18,7 @@ public class Score {
 	public static final int NOM_DICTIONNAIRE = 6 ;
 	public static final int TEMPS_HMS = 7 ;
 	
+	//Informations stockées par la classe relative au score
 	public int	niveau ;
 	public String	joueur ;
 	public int	score ;
@@ -20,6 +26,11 @@ public class Score {
 	public int	temps ;
 	public String	dictionnaire ;
 	
+	/**
+	 * Constructeur d'initialisation avec juste le niveau et le dictionnaire (sert à initialiser les highscores)
+	 * @param niveau niveau auquel est réalisé le score
+	 * @param dictionnaire Liste de mot utilisée pour faire ce score
+	 */
 	public Score(int niveau, String dictionnaire) {
 		this.joueur = " " ;	//Chaine vide mais contenant au moins un caractère sinon le parsing du score plante
 		this.niveau = niveau ;
@@ -38,6 +49,11 @@ public class Score {
 		this.dictionnaire = dictionnaire ;
 	}
 	
+	/**
+	 * Renvoie une chaine contenant l'information demandée dans le score.
+	 * @param noItem Index de l'information demandée dans le score (utiliser les constantes définies par la classe pour sélectionner le bon objet)
+	 * @return Chaine contenant l'information demandée
+	 */
 	public String getStringItemScore(int noItem) {
 		switch (noItem) {
 			case NOM_JOUEUR :

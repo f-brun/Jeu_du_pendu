@@ -29,8 +29,8 @@ import java.util.Iterator;
 
 @SuppressWarnings("static-access")
 /**
- *
- * @author Florent
+ * Ecran principal du jeu où s'affiche les informations, les lettres et où on oriente ensuite vers l'écran perdu ou gagné
+ * @author Florent Brun
  */
 public class EcranJeu implements Screen {
 	
@@ -41,6 +41,7 @@ public class EcranJeu implements Screen {
     public static final String TEXTE_NOMBRE_DE_MOTS_DEVINES = "Mots devines: " ;
     public static final String TEXTE_NB_ESSAIS_RESTANTS = "Nombre d'essais\nrestants :\n" ;
     public static final String TEXTE_TEMPS_ECOULE = "\n\nTemps: " ;
+    public static int ESPACEMENT_TABLE_INFOS = 20 ;		//Espacement entre l'image centrale et les autres éléments autour de sa table
 	static Pendu jeu ;	//référence aux données du jeu
     
     public Chrono chronoMot ;
@@ -112,9 +113,9 @@ public class EcranJeu implements Screen {
 
 
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire
-        tInfos.add(Pendu.lNbMotsDevines).maxWidth(jeu.getLargeurEcran()/4).space(8) ;
-        tInfos.add(jeu.affichagePendu).maxWidth(jeu.getLargeurEcran()/2) ; //.align(Align.center) ;
-        tInfos.add(Pendu.lNbEssaisRestants).maxWidth(jeu.getLargeurEcran()/4).space(8) ;
+        tInfos.add(Pendu.lNbMotsDevines).maxWidth(jeu.getLargeurEcran()/4) ;
+        tInfos.add(jeu.affichagePendu).maxWidth(jeu.getLargeurEcran()/2).space(ESPACEMENT_TABLE_INFOS) ; //.align(Align.center) ;
+        tInfos.add(Pendu.lNbEssaisRestants).maxWidth(jeu.getLargeurEcran()/4) ;
         celluleInfos = table.add(tInfos).width(jeu.getLargeurEcran()) ;	//.align(Align.center)
         
         table.row();    //Indique que l'élément suivant sera sur une ligne supplémentaire

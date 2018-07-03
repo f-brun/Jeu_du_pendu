@@ -21,7 +21,12 @@ import fr.jeux.pendu.GestionClavier.EcouteClavier;
 import fr.jeux.pendu.Highscore;
 import fr.jeux.pendu.Pendu;
 import fr.jeux.pendu.Score;
-
+/**
+ * Classe de gestion de l'affichage des highscores. On peut utiliser les fléches ou faire glisser son doigt (swipe) pour faire défiler les niveaux.
+ * Si on vient de réaliser un record, le score correspondant est mis en évidence dans la liste.
+ * @author Florent Brun
+ *
+ */
 public class EcranHighscores implements Screen {
     public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
 			 												{2.5f,   2f, 1.5f,   1f, 0.7f, 0.5f}};

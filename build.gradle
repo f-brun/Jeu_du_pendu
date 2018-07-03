@@ -45,7 +45,7 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+//        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         
     }
@@ -68,29 +68,12 @@ project(":android") {
     }
 }
 
-/*
-project(":html") {
-    apply plugin: "gwt"
-    apply plugin: "war"
-
-
-    dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        compile "net.dermetfan.libgdx-utils:libgdx-utils:0.13.4:sources"
-        
-    }
-}
-*/
 project(":core") {
     apply plugin: "java"
 
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-//        compile "net.dermetfan.libgdx-utils:libgdx-utils:0.13.4"
         
     }
 }

@@ -1,5 +1,10 @@
 package fr.jeux.pendu;
 
+/**
+ * Classe englobante des highscores. Permet de regrouper les highscores pour différents niveau et dictionnaires dans une seule structure
+ * @author Florent Brun
+ *
+ */
 public class Highscores {
 	private Highscore[][] highscores ;	//Tableau des highscores des différents niveaux et dictionnaires
 	

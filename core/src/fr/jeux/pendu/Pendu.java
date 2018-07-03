@@ -11,7 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import fr.jeux.pendu.screens.* ;
-
+/**
+ * Classe de démarrage du jeu. Elle contient toutes les informations importantes sous forme de variables statiques afin que toutes les parties du programme puissent y faire référence facilement.
+ * C'est aussi cette classe qui se charge de toutes les initialisations, pause/reprise et fermeture de l'application
+ * @author Florent
+ *
+ */
 public class Pendu extends Game {
 
     public static boolean DEBUG = false ;
