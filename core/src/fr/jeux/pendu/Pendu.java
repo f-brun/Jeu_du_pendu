@@ -63,8 +63,9 @@ public class Pendu extends Game {
     public static int nbMotsDevines ;	//Nombre de mots devinés à la suite dans la partie en cours
     public static Chrono chrono ;	//Chronometre de la partie
     public static final int NB_IMAGES = 12 ;
-    public static final String IMAGE_GAGNE = "images/gagne.gif" ;   //Image affichée en cas de victoire
-    public static final String IMAGE_PERDU = "images/perdu.jpg" ;   //Image affichée en cas de défaite
+    public static final String IMAGE_GAGNE = "images/gagne.png" ;   //Image affichée en cas de victoire
+    public static final String IMAGE_PERDU = "images/perdu.png" ;   //Image affichée en cas de défaite
+    public static final String IMAGE_HIGHSCORE = "images/felicitations.png" ;   //Image affichée en cas de défaite
     public static final float ATTENTE_FIN_PARTIE = 8f ;    //Nombre de secondes où on affiche l'image de fin de partie avant de revenir au menu
     public static Texture[] imagePendu = new Texture[NB_IMAGES] ;	//Stocke les images successives de pendu
     public static final String CHEMIN_FICHIERS = "images/" ;  //Chemin vers les fichiers de données
