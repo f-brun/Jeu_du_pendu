@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -17,7 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -40,11 +44,13 @@ public class EcranPerdu implements Screen {
     public static final float POSITION_Y_DIALOG_HIGHSCORE = 0.9f ;	//Position verticale du dialog des highscores en % de l'écran (afficher en haut pour laisser la place d'afficher le clavier virtuel sur mobile)
     public static final float[][] TAILLES_POLICE_ADAPTEES_DIALOGUE = {{500,  450,  400,  300,  200,  100,    0},
 																	 {   2, 1.8f, 1.5f,   1f, 0.8f, 0.5f, 0.4f}};
+    public static final float PROPORTION_IMAGE_PERDU = 0.7f ;
 
     public static final String[] POSITION = {"premier", "deuxieme", "troisieme", "quatrieme", "cinquieme", "sixieme", "septieme", "huitieme", "neuvieme", "dixieme",
     								"onzieme", "douzieme", "treizieme", "quatorzieme", "quinzieme", "seizieme", "dix-septieme", "dix-huitieme", "dix-neuvieme", "vingtieme"} ;
 
     static final float DUREE_AFFICHAGE_PERDU = 1 ;	//Temps d'attente avant de pouvoir passer à la suite
+    static final float DUREE_AFFICHAGE_FELICITATIONS = 2f ;	//Temps d'affichage de l'image de félicitation
     
     private static Stage stage = null ;
     private static Table table = null ;  //Table contenant les labels
@@ -104,7 +110,7 @@ public class EcranPerdu implements Screen {
         table.setFillParent(true);  //La table occupe tout l'écran
         table.add(lAffichageScore) ;
         table.row();
-        table.add(imagePerdu);
+        table.add(imagePerdu).width(Pendu.getLargeurEcran()*PROPORTION_IMAGE_PERDU);
         table.row() ;    //Place le texte en dessous de l'image
         celluleTexteATrouver = table.add(lTexteATrouver).align(Align.center).width(Pendu.getLargeurEcran()) ;
         table.setVisible(true) ;
@@ -198,12 +204,27 @@ public class EcranPerdu implements Screen {
         	@Override
         	public void run() {
             	if (Pendu.position >= 0) {			//Si on a un record
-            		afficheDialogueHighscore() ;	//On affiche le dialogue pour récupérer le nom
+            		afficheFelicitations() ;
+            		Timer.Task attenteFelicitations = new Timer.Task() {
+            			@Override
+            			public void run() {
+            				dialogHighscore.remove() ;	//Ferme le dialog précédent (avec l'image de félicitation)
+            				afficheDialogueHighscore() ;	//On affiche le dialogue pour récupérer le nom
+            			}
+            		} ;
+            		schedule(attenteFelicitations,DUREE_AFFICHAGE_FELICITATIONS) ;
+            		
             	}
             	else imagePerdu.setTouchable(Touchable.enabled) ;	//Sinon on autorise la sortie de l'écran par l'image
         	}
         } ;
         schedule(attenteFinie,DUREE_AFFICHAGE_PERDU) ;
+    }
+    
+    public void afficheFelicitations() {
+    	dialogHighscore = new Dialog("Felicitations !", Pendu.getSkin()) ;
+    	dialogHighscore.add(new Image(new Texture(Pendu.IMAGE_HIGHSCORE)));
+        dialogHighscore.show(stage) ;	//Affiche la fenetre de dialogue
     }
     
     public void afficheDialogueHighscore() {
