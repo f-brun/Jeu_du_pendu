@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -42,6 +43,7 @@ public class EcranPerdu implements Screen {
     public static final int LARGEUR_DIALOG_PREFEREE = 600 ;
     public static final int HAUTEUR_DIALOG_PREFEREE = 350 ;
     public static final float POSITION_Y_DIALOG_HIGHSCORE = 0.9f ;	//Position verticale du dialog des highscores en % de l'écran (afficher en haut pour laisser la place d'afficher le clavier virtuel sur mobile)
+    public static final float POSITION_Y_DIALOG_FELICITATIONS = 0.5f ;	//Position verticale du dialog de félicitation
     public static final float[][] TAILLES_POLICE_ADAPTEES_DIALOGUE = {{500,  450,  400,  300,  200,  100,    0},
 																	 {   2, 1.8f, 1.5f,   1f, 0.8f, 0.5f, 0.4f}};
     public static final float PROPORTION_IMAGE_PERDU = 0.7f ;
@@ -55,12 +57,15 @@ public class EcranPerdu implements Screen {
     private static Stage stage = null ;
     private static Table table = null ;  //Table contenant les labels
 
-    private static Label lAffichageScore = null ;
-    private static Texture img = null ; 
-    private static Image imagePerdu = null ;
-    private static Label lTexteATrouver = null ;
+    private static Label    lAffichageScore = null ;
+    private static Texture  texturePerdu = null ;    //Texture de l'image perdu !
+    private static Texture  textureFelicitations = null ;   //Texture de l'image de félicitation
+    private static Image    imagePerdu = null ;
+    private static Image    imageFelicitations = null ;
+    private static Label    lTexteATrouver = null ;
     
-    public static Dialog dialogHighscore ;	//Fenetre de dialogue pour informer qu'un highscore vient d'etre realise
+    public static Dialog dialogHighscore ;	//Fenêtre de dialogue pour informer qu'un highscore vient d'etre realise
+    public static Dialog dialogFelicitations ;	//Fenêtre de dialogue pour afficher l'image de félicitation
 	public static TextField	saisieNom ;	//Textfield pour la saisie du nom du joueur
 	Label		lHighscore ;
 	Cell<Label>	celluleTexteHighscore ;
@@ -83,19 +88,13 @@ public class EcranPerdu implements Screen {
 
        	stage = new Stage(new ScreenViewport());
 
-        Gdx.input.setInputProcessor(stage);		//Met le focus sur notre écran
-        
-        if (Pendu.getDebugState()) {
-            System.out.println("Perdu !");
-        }
-
         //Crée l'affichage du score final
        	lAffichageScore = new Label("Score final : "+ Integer.toString(Pendu.getScore()),Pendu.getSkin()) ;
-        
 
         //Crée le label contenant l'image
-       	img = new Texture(Pendu.IMAGE_PERDU);
-       	imagePerdu = new Image(img);
+       	texturePerdu = new Texture(Pendu.IMAGE_PERDU);
+       	imagePerdu = new Image(texturePerdu);
+       	imagePerdu.setScaling(Scaling.fit); //Pour faire en sorte de conserver l'ascpect ratio
 
         //Crée le label contenant le mot à trouver
         lTexteATrouver = new Label("",Pendu.skin) ;
@@ -105,12 +104,12 @@ public class EcranPerdu implements Screen {
         table = new Table() ;
 
         //Définit la disposition de la table
-        table.pad(3) ;
+        table.pad(Pendu.getHauteurEcran()/40) ;
         if (Pendu.getDebugState()) table.setDebug(true); // This is optional, but enables debug lines for tables.
         table.setFillParent(true);  //La table occupe tout l'écran
         table.add(lAffichageScore) ;
         table.row();
-        table.add(imagePerdu).width(Pendu.getLargeurEcran()*PROPORTION_IMAGE_PERDU);
+        table.add(imagePerdu).maxHeight(Pendu.getHauteurEcran()*PROPORTION_IMAGE_PERDU);    //Ajoute l'image en limitant sa taille verticale pour avoir la place de voir les textes
         table.row() ;    //Place le texte en dessous de l'image
         celluleTexteATrouver = table.add(lTexteATrouver).align(Align.center).width(Pendu.getLargeurEcran()) ;
         table.setVisible(true) ;
@@ -169,7 +168,8 @@ public class EcranPerdu implements Screen {
    		lAffichageScore.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
    		lTexteATrouver.setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getHauteurEcran(),TAILLES_POLICE_ADAPTEES));	//Adapte la taille de la police à la hauteur de l'affichage
    		if (dialogHighscore != null) dimensionneDialogHighscore() ;
-   		
+        if (dialogFelicitations != null) dimmensionneDialogFelicitations() ;
+
         stage.getViewport().update(width, height, true);
     }
 
@@ -208,7 +208,7 @@ public class EcranPerdu implements Screen {
             		Timer.Task attenteFelicitations = new Timer.Task() {
             			@Override
             			public void run() {
-            				dialogHighscore.remove() ;	//Ferme le dialog précédent (avec l'image de félicitation)
+                            dialogFelicitations.remove() ;	//Ferme le dialog précédent (avec l'image de félicitation)
             				afficheDialogueHighscore() ;	//On affiche le dialogue pour récupérer le nom
             			}
             		} ;
@@ -222,11 +222,24 @@ public class EcranPerdu implements Screen {
     }
     
     public void afficheFelicitations() {
-    	dialogHighscore = new Dialog("Felicitations !", Pendu.getSkin()) ;
-    	dialogHighscore.add(new Image(new Texture(Pendu.IMAGE_HIGHSCORE)));
-        dialogHighscore.show(stage) ;	//Affiche la fenetre de dialogue
+    	dialogFelicitations = new Dialog("Felicitations !", Pendu.getSkin()) ;
+        textureFelicitations = new Texture(Pendu.IMAGE_HIGHSCORE) ;
+        imageFelicitations = new Image(textureFelicitations) ;
+        imageFelicitations.setScaling(Scaling.fit);
+        dialogFelicitations.add(imageFelicitations);
+        dialogFelicitations.show(stage) ;	//Affiche la fenetre de dialogue
+        dimmensionneDialogFelicitations() ;
     }
-    
+
+    private void dimmensionneDialogFelicitations() {
+        float ratio = imageFelicitations.getWidth()/imageFelicitations.getHeight() ;    //Détermine le ratio d'aspect de l'image
+        if (Pendu.getHauteurEcran() < Pendu.getLargeurEcran()/ratio) {  //Si l'écran est trop peu haut
+            dialogFelicitations.setSize(Pendu.getHauteurEcran()*ratio,Pendu.getHauteurEcran());      //On dimensionne en fonction de la hauteur
+        }
+        else dialogFelicitations.setSize(Pendu.getLargeurEcran(),Pendu.getLargeurEcran()/ratio );   //Sinon on dimensionne en fonction de la largeur
+        dialogFelicitations.setPosition((Pendu.getLargeurEcran()-dialogFelicitations.getWidth())/2,((Pendu.getHauteurEcran()-dialogFelicitations.getHeight())*POSITION_Y_DIALOG_FELICITATIONS));
+    }
+
     public void afficheDialogueHighscore() {
     	TextButton	boutonOK ;
     	
@@ -303,6 +316,8 @@ public class EcranPerdu implements Screen {
     public void dispose() {
         if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran perdu") ;
     	Pendu.setEcranPerdu(null) ;	//Supprime la référence à l'écran pour l'obliger à être re-crée la prochaine fois
+        if (texturePerdu != null) texturePerdu.dispose() ;
+        if (textureFelicitations != null) textureFelicitations.dispose() ;
         if (stage != null) stage.dispose();
     }
 }
