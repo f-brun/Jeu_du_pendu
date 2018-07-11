@@ -18,25 +18,26 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import fr.jeux.pendu.GestionClavier;
 import fr.jeux.pendu.Pendu ;
 import fr.jeux.pendu.GestionClavier.EcouteClavier;
+import fr.jeux.pendu.Score;
 
 public class EcranAccueil implements Screen {
 	
-    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600, 400,  300,  200,  100,    0},
+    private static final float[][] TAILLES_POLICE_ADAPTEES = {{600, 400,  300,  200,  100,    0},
 															 {  3,   2, 1.5f,   1f, 0.5f, 0.3f}};
-    public static final float ESPACEMENT_BOUTONS = 15 ;
-    public static final float HAUTEUR_UI = 600 ;
+    private static final float ESPACEMENT_BOUTONS = 15 ;
+    private static final float HAUTEUR_UI = 600 ;
 
     public Stage stage ;
-    public Table tMenu ;  //Table contenant le menu
+    private Table tMenu ;  //Table contenant le menu
 
-    protected TextButton boutonJeu, boutonReglages, boutonHighscores, boutonQuitter ;
+    private TextButton boutonJeu, boutonReglages, boutonHighscores, boutonQuitter ;
     protected Label titre;
-    protected Image imageTitre;
+    private Image imageTitre;
 
-    Texture img;
-    Cell[]	cellulesUI ;
-    
-    Pendu jeu ;	//référence aux données du jeu
+    private Texture img;
+    private Cell[]	cellulesUI ;
+
+    private Pendu jeu ;	//référence aux données du jeu
 	
     public EcranAccueil(Pendu jeuEnCours) {
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
@@ -46,10 +47,8 @@ public class EcranAccueil implements Screen {
     	creeUI() ;
     }
 
-    public void creeUI() {
+    private void creeUI() {
         stage = new Stage(new ScreenViewport());
-
-        Gdx.input.setInputProcessor(stage);
 
         tMenu = new Table();
         tMenu.setFillParent(true);  //La table occupe tout l'écran
@@ -83,9 +82,7 @@ public class EcranAccueil implements Screen {
             public void changed(ChangeEvent event, Actor acteur) {
             	if (Pendu.getDebugState()) Gdx.app.log("INFO","raz du nb de mots devinnés");
             	Pendu.nbMotsDevines = 0 ;	//On débute une nouvelle partie, donc on ré-initialise le nb de mots devinnés. Le reste sera initialisé dans l'écran jeu
-            	Pendu.score.score = 0 ;
-            	Pendu.score.niveau = Pendu.getNiveau().getNumero() ;
-            	Pendu.score.dictionnaire = Pendu.dictionnaires.getDictionnaireActuel().getLangue() ;
+            	Pendu.score = new Score(Pendu.score.getJoueur(),Pendu.getNiveau().getNumero(),Pendu.dictionnaires.getDictionnaireActuel().getLangue()) ;    //On refait un score à 0 avec même joueur, niveau et dico
             	if (Pendu.lNbMotsDevines != null) Pendu.lNbMotsDevines.setText("Nombre de mots\ndevinnes :\n"+Pendu.nbMotsDevines);
 
             	Pendu.chrono.depart(); 	//Lance le chrono
@@ -160,9 +157,9 @@ public class EcranAccueil implements Screen {
 		im = new InputMultiplexer() ;
 		im.addProcessor(stage);
 		im.addProcessor(new GestionClavier(new EcouteClavier(){
-			public void toucheGAUCHE() { } ;
-			public void toucheDROITE() { } ;
-		    public void toucheESCAPE() { if (Pendu.getDebugState()) Gdx.app.log("INFO","Sortie du programme par touche Esc ou Back"); jeu.quitter() ; } ; 
+			public void toucheGAUCHE() { }
+			public void toucheDROITE() { }
+		    public void toucheESCAPE() { if (Pendu.getDebugState()) Gdx.app.log("INFO","Sortie du programme par touche Esc ou Back"); jeu.quitter() ; }
 		}));
 		Gdx.input.setInputProcessor(im) ;
     }

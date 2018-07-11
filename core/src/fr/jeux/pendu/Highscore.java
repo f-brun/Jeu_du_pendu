@@ -121,7 +121,7 @@ public class Highscore {
 
 		for (int i = 0 ; i < meilleursScores.length ; i++) {
 			score = meilleursScores[i] ;
-			score.joueur = score.joueur.replaceAll(DELIMITEUR_ENREGISTREMENTS, CARACTERE_REMPLACEMENT) ;	//Remplace les occurences du délimiteur dans le nom du joueur
+			score.setJoueur(score.getJoueur().replaceAll(DELIMITEUR_ENREGISTREMENTS, CARACTERE_REMPLACEMENT)) ;	//Remplace les occurences du délimiteur dans le nom du joueur
 
 			//Fabrique la ligne a insérer dans le fichier de highscore
 			ligne = "" ;
@@ -150,9 +150,9 @@ public class Highscore {
 	public int insereScore(Score score) {
 		int i ;
 		for (i = meilleursScores.length - 1 ; i > 0 ; i--) {	//On part de la fin
-			if ( (score.score > meilleursScores[i].score)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps && score.temps != 0) ) {	//Si le nouveau score est meilleur
+			if ( (score.getScore() > meilleursScores[i].getScore())
+			  || (score.getScore() == meilleursScores[i].getScore() && score.getNbMotsDevines() > meilleursScores[i].getNbMotsDevines())
+			  || (score.getScore() == meilleursScores[i].getScore() && score.getNbMotsDevines() == meilleursScores[i].getNbMotsDevines() && score.getTemps() <= meilleursScores[i].getTemps() && score.getTemps() != 0) ) {	//Si le nouveau score est meilleur
 				meilleursScores[i] = meilleursScores[i-1] ;		//On recopie pour decaler les highscores et faire de la place pour ce nouveau record
 			}
 			else if (i > 0) {	//Si ce score est moins bon
@@ -161,9 +161,9 @@ public class Highscore {
 			}
 		}
 		if (i == 0) {	//Si i = 0, il reste a comparer avec le premier 
-			if ( (score.score > meilleursScores[i].score)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines > meilleursScores[i].nbMotsDevines)
-			  || (score.score == meilleursScores[i].score && score.nbMotsDevines == meilleursScores[i].nbMotsDevines && score.temps <= meilleursScores[i].temps) && score.temps != 0) {	//Si ce score est meilleur
+			if ( (score.getScore() > meilleursScores[i].getScore())
+			  || (score.getScore() == meilleursScores[i].getScore() && score.getNbMotsDevines() > meilleursScores[i].getNbMotsDevines())
+			  || (score.getScore() == meilleursScores[i].getScore() && score.getNbMotsDevines() == meilleursScores[i].getNbMotsDevines() && score.getTemps() <= meilleursScores[i].getTemps()) && score.getTemps() != 0) {	//Si ce score est meilleur
 				meilleursScores[i] = score ;	//On prend la place du premier (l'ancien premier a déjà été inscrit en 2° position)
 				ecritScores() ;
 				return 0 ;

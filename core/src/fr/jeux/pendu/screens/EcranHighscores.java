@@ -35,12 +35,12 @@ public class EcranHighscores implements Screen {
 
     static final int[] COL_HIGHSCORES = {0, Score.NOM_JOUEUR, Score.SCORE, Score.NB_MOTS_DEVINES, Score.TEMPS_HMS } ;
     static final String[] NOMS_COL = {"No", "Nom", "Score", "Mots", "Temps"} ;
-    static final int[][] TAILLES_COLONNES = { {13,80}, {80,800}, {25,160}, {20,100}, {35,180} } ;	//Largeurs min et max des colonnes
-    static final int ESPACEMENT_COLONNES = 10 ;		//Espacement entre les colonnes
+    static final int[][] TAILLES_COLONNES = { {13,80}, {80,800}, {20,160}, {15,100}, {30,180} } ;	//Largeurs min et max des colonnes
+    static final int ESPACEMENT_COLONNES = 5 ;		//Espacement entre les colonnes
      	
    	static final int[] ALIGNEMENTS_COL_HIGHSCORES = {Align.right, Align.left, Align.center, Align.center, Align.center} ;
     static final float[] LARGEUR_COLONNES_HIGHSCORES = {7f,50f,11f,10f,15f} ;	//Largeurs des colonnes de highscore en %
-    static final float LARGEUR_MAX_HIGHSCORES = 0.95f ;		//Largeur maxi des highscores en % de la fenêtre
+    static final float LARGEUR_MAX_HIGHSCORES = 0.98f ;		//Largeur maxi des highscores en % de la fenêtre
     static final float COEF_HIGHSCORES = 0.85f ;
     static final float COEF_SCORE_JOUEUR = 1.2f ;
 
@@ -77,9 +77,9 @@ public class EcranHighscores implements Screen {
 
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
  
-    	if (Pendu.getEcranHighscores() == null) Pendu.setEcranHighscores(this); 	//Ecrit la référence à l'écran que l'on vient de créer
+    	Pendu.setEcranHighscores(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
-    	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
+    	creeUI() ; //C'est le premier appel, on crée l'affichage
 
 	}
     
@@ -209,7 +209,7 @@ public class EcranHighscores implements Screen {
 		//Redimensionne le texte des scores en mettant la bonne couleur
 		for (int i = 0 ; i < highscore.length ; i++) {
 			for (int j=0 ; j < COL_HIGHSCORES.length ; j++) {
-				if ( (Pendu.position == i) && (Pendu.niveau.getNumero() == noNiveauAAfficher) ) {	//Si le highscore vient d'etre fait (meme niveau et position = -1), on l'affiche en rouge et gros
+				if ( (Pendu.position == i) && (Pendu.niveau.getNumero() == noNiveauAAfficher) ) {	//Si le highscore vient d'etre fait (meme niveau et bonne position), on l'affiche en rouge et gros
 					positionHighscore = lScores[i][0].getY() ;	//Récupère la position verticale du highscore dans la table
 					lScores[i][j].setColor(Color.FIREBRICK);
 					lScores[i][j].setFontScale(jeu.getTaillePoliceTitreAdaptee(Pendu.getLargeurEcran(),TAILLES_POLICE_ADAPTEES)*COEF_SCORE_JOUEUR);	//Adapte la taille de la police à la hauteur de l'affichage

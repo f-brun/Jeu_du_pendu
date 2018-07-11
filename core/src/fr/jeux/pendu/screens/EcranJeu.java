@@ -174,7 +174,7 @@ public class EcranJeu implements Screen {
         jeu.barreMinuteur.stop();
         jeu.lMotDevine.setText(SepareParDesEspaces(jeu.motDevine));
 
-        jeu.score.score += jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent()) ;	//On ajoute des points en fonction de la réussite du joueur
+        jeu.score.addScore(jeu.getNiveau().calculeGain(jeu.barreMinuteur.getPercent())) ;	//On ajoute des points en fonction de la réussite du joueur
         jeu.nbMotsDevines++ ;
         
         Pendu.lNbMotsDevines.setText(TEXTE_NOMBRE_DE_MOTS_DEVINES+Pendu.nbMotsDevines+" "+TEXTE_TEMPS_ECOULE+Pendu.chrono.getDureeHMSS()+" ");
@@ -202,8 +202,8 @@ public class EcranJeu implements Screen {
     public void perdu(Pendu jeu) {
     	jeu.barreMinuteur.stop();
     	jeu.chrono.stop();
-    	Pendu.score.temps = (int) jeu.chrono.soustraitDuree(chronoMot.stop())/1000 ;	//On soustrait la durée du mot en cours pour qu'il ne soit pas comptabilisé dans la durée de la partie
-    	Pendu.score.nbMotsDevines = Pendu.nbMotsDevines ;
+    	Pendu.score.setTemps( (int) jeu.chrono.soustraitDuree(chronoMot.stop())/1000 ) ;	//On soustrait la durée du mot en cours pour qu'il ne soit pas comptabilisé dans la durée de la partie
+    	Pendu.score.setNbMotsDevines(Pendu.nbMotsDevines) ;
 
     	if (jeu.getEcranPerdu() == null) {
             jeu.setScreen(new EcranPerdu(jeu));		//Bascule sur l'écran de game over

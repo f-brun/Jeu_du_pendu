@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -22,7 +21,7 @@ import fr.jeux.pendu.GestionClavier.EcouteClavier;
 
 public class EcranReglages implements Screen {
 
-    public static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
+    private static final float[][] TAILLES_POLICE_ADAPTEES = {{600,  400,  300,  200,  100,    0},
 															{   3,   2f, 1.5f,   1f, 0.9f, 0.5f}};
 
     public Stage stage ;
@@ -34,9 +33,9 @@ public class EcranReglages implements Screen {
     private Label titre, langueChoisie;
     private Cell<Label>	celluleLangueChoisie ;
     
-    Pendu jeu ;	//référence aux données du jeu
+    private Pendu jeu ;	//référence aux données du jeu
 	
-    public EcranReglages(Pendu jeuEnCours) {
+    EcranReglages(Pendu jeuEnCours) {
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
     	
     	Pendu.setEcranReglages(this) ; 	//Enregistre la référence de cet écran
@@ -65,7 +64,7 @@ public class EcranReglages implements Screen {
         }
         listeNiveaux.setItems(intitulesNiveaux) ;
         
-     //Prï¿½pare le listener des boutons langue
+     //Prépare le listener des niveaux
         listeNiveaux.addListener( new ChangeListener() {
         	public void changed(ChangeEvent event, Actor acteur) {
                 @SuppressWarnings("unchecked")
@@ -105,7 +104,7 @@ public class EcranReglages implements Screen {
         celluleLangueChoisie = table.add(langueChoisie).align(Align.center).width(Pendu.getLargeurEcran()) ;
     }
 
-    public void retourAccueil() {
+    private void retourAccueil() {
     	if (Pendu.getEcranAccueil() != null) {
     		jeu.setScreen(Pendu.getEcranAccueil());	//Bascule sur l'écran d'accueil
     	}
@@ -142,9 +141,9 @@ public class EcranReglages implements Screen {
 		im = new InputMultiplexer() ;
 		im.addProcessor(stage);
 		im.addProcessor(new GestionClavier(new EcouteClavier(){
-			public void toucheGAUCHE() { } ;
-			public void toucheDROITE() { } ;
-		    public void toucheESCAPE() { Pendu.getEcranReglages().retourAccueil() ; } ; 
+			public void toucheGAUCHE() { }
+			public void toucheDROITE() { }
+		    public void toucheESCAPE() { Pendu.getEcranReglages().retourAccueil() ; }
 		}));
 		Gdx.input.setInputProcessor(im) ;
 
@@ -177,6 +176,6 @@ public class EcranReglages implements Screen {
         if (Pendu.DEBUG) Gdx.app.log("INFO","Suppression des references de l'ecran des reglages") ;
     	Pendu.setEcranReglages(null) ;	//Supprime la reference a l'ecran pour l'obliger a etre re-cree la prochaine fois
         if (Pendu.DEBUG) Gdx.app.log("INFO","Destruction du stage") ;
-    	stage.dispose();
+    	if (stage != null) stage.dispose();
     }
 }

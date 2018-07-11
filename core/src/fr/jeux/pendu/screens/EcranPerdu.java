@@ -79,9 +79,9 @@ public class EcranPerdu implements Screen {
 
     	jeu = jeuEnCours ;	//reprend la référence au jeu pour toutes les méthodes de la classe
  
-    	if (Pendu.getEcranPerdu() == null) Pendu.setEcranPerdu(this); 	//Ecrit la référence à l'écran que l'on vient de créer
+    	Pendu.setEcranPerdu(this); 	//Ecrit la référence à l'écran que l'on vient de créer
     	
-    	if (stage == null) creeUI() ; //Si c'est le premier appel, on crée l'affichage
+    	creeUI() ; //C'est le premier appel, on crée l'affichage
     }
     
     private void creeUI() {
@@ -118,8 +118,8 @@ public class EcranPerdu implements Screen {
         
         imagePerdu.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.niveau + ";Joueur:" + Pendu.score.joueur + ";Score:" + Pendu.score.score + ";Mots devines:" + Pendu.score.nbMotsDevines
-                		+ ";Temps:" + Pendu.score.temps + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log            		Pendu.ecranPerdu.retourMenu() ;
+                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.getNiveau() + ";Joueur:" + Pendu.score.getJoueur() + ";Score:" + Pendu.score.getScore() +
+                        ";Mots devines:" + Pendu.score.getNbMotsDevines() + ";Temps:" + Pendu.score.getTemps() + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
                 Pendu.ecranPerdu.retourMenu() ;
             }
         });
@@ -192,10 +192,10 @@ public class EcranPerdu implements Screen {
         Gdx.input.setInputProcessor(im) ;
     	
         //On écrit les infos pour le deboggage
-        if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + Pendu.score.temps) ;
+        if (Pendu.getDebugState()) Gdx.app.log("INFO","Duree de la partie : " + Pendu.score.getTemps()) ;
         Pendu.position = Pendu.highscores.getHighscoreActuel().insereScore(Pendu.score) ;	//Puis on determine la position dans les highscores
         
-        if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.score) ;
+        if (Pendu.getDebugState()) Gdx.app.log("INFO","Score : "+Pendu.score.getScore()) ;
     	if (Pendu.getDebugState() && Pendu.position >= 0) Gdx.app.log("INFO"," ("+POSITION[Pendu.position]+" dans les highscores)");
         
         Timer.Task attenteFinie; //Contiendra le code a exécuter pour afficher l'image de fin après un délai
@@ -249,20 +249,19 @@ public class EcranPerdu implements Screen {
     	lHighscore.setWrap(true);
     	lHighscore.setAlignment(Align.center); 
    		
-   		saisieNom = new TextField(Pendu.score.joueur, Pendu.getSkin()) ;
+   		saisieNom = new TextField(Pendu.score.getJoueur(), Pendu.getSkin()) ;
    		saisieNom.setMaxLength(Highscore.LONGUEUR_MAX_NOM_JOUEUR);
 
     	dialogHighscore = new Dialog("Felicitations !", Pendu.getSkin())
         {
             protected void result(Object object)
             {
-            	Pendu.score.joueur = saisieNom.getText() ;	//On change le nom du joueur
+            	Pendu.score.setJoueur(saisieNom.getText()) ;	//On change le nom du joueur
             	Pendu.config.setValeurCle(Pendu.CLE_JOUEUR, saisieNom.getText() ) ;		//On enregistre dans la config persistante pour que ça reste pour les parties suivantes
             	Pendu.highscores.getHighscoreActuel().setHighscore(Pendu.position, Pendu.score) ;	//Inscrit le score dans la table des highscores
             	Pendu.highscores.getHighscoreActuel().ecritScores(); 	//et on sauvegarde les scores
-                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.niveau + ";Joueur:" + Pendu.score.joueur + ";Score:" + Pendu.score.score + ";Mots devines:" + Pendu.score.nbMotsDevines
-                		+ ";Temps:" + Pendu.score.temps + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
-                Pendu.ecranPerdu.retourMenu() ;
+                if (Pendu.logger != null) Pendu.logger.ecritLog("Niv " + Pendu.score.getNiveau() + ";Joueur:" + Pendu.score.getJoueur() + ";Score:" + Pendu.score.getScore()
+                        + ";Mots devines:" + Pendu.score.getNbMotsDevines() + ";Temps:" + Pendu.score.getTemps() + ";Dico:" + Pendu.dictionnaires.getDictionnaireActuel().getLangue());	//On inscrit le score dans le log
             	Pendu.ecranPerdu.highscoreObtenu() ;	//puis on bascule sur l'écran des highscores
             }
         };

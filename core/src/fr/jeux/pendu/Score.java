@@ -19,12 +19,12 @@ public class Score {
 	public static final int TEMPS_HMS = 7 ;
 	
 	//Informations stockées par la classe relative au score
-	public int	niveau ;
-	public String	joueur ;
-	public int	score ;
-	public int	nbMotsDevines ;
-	public int	temps ;
-	public String	dictionnaire ;
+	private int	niveau ;
+	private String	joueur ;
+    private int	score ;
+    private int	nbMotsDevines ;
+    private int	temps ;
+	private String	dictionnaire ;
 	
 	/**
 	 * Constructeur d'initialisation avec juste le niveau et le dictionnaire (sert à initialiser les highscores)
@@ -32,15 +32,21 @@ public class Score {
 	 * @param dictionnaire Liste de mot utilisée pour faire ce score
 	 */
 	public Score(int niveau, String dictionnaire) {
-		this.joueur = " " ;	//Chaine vide mais contenant au moins un caractère sinon le parsing du score plante
-		this.niveau = niveau ;
-		this.score = 0 ;
-		this.nbMotsDevines = 0 ;
-		this.temps = 0 ;
-		this.dictionnaire = dictionnaire ;
+		this(niveau," ",0,0,0,dictionnaire) ; //Chaine vide mais contenant au moins un caractère pour le nom de joueur sinon le parsing du score plante
 	}
-	
-	public Score (int niveau, String joueur, int score, int nbMots, int temps, String dictionnaire) {
+
+	/**
+	 * Constructeur d'initialisation avec le nom du joueur le niveau et le dictionnaire (sert à redémarrer une partie)
+	 * @param joueur Nom du joueur
+	 * @param niveau niveau auquel est réalisé le score
+	 * @param dictionnaire Liste de mot utilisée pour faire ce score
+	 */
+    public Score(String joueur, int niveau, String dictionnaire) {
+        this(niveau,joueur,0,0,0,dictionnaire) ; //Chaine vide mais contenant au moins un caractère pour le nom de joueur sinon le parsing du score plante
+    }
+
+
+    public Score (int niveau, String joueur, int score, int nbMots, int temps, String dictionnaire) {
 		this.joueur = joueur ;
 		this.niveau = niveau ;
 		this.score = score ;
@@ -77,11 +83,22 @@ public class Score {
 	}
 	
 	/**
-	 * Renvoie une copie du score qui possède donc une référence et un espace mémoire propre
-	 * @param original
+	 * Renvoie une copie du score (qui possède donc une référence et un espace mémoire propre)
 	 * @return copie du score
 	 */
 	public Score copie() {
 		return new Score(this.niveau, this.joueur, this.score, this.nbMotsDevines, this.temps, this.dictionnaire) ;
 	}
+
+    public String getJoueur() { return joueur; }
+    public void setJoueur(String nomJoueur)	{ this.joueur = nomJoueur ;}
+	public int getNiveau()	{ return this.niveau ; }
+	public void setNiveau(int nouveauNiveau) { this.niveau = nouveauNiveau ; }
+	public int getScore()	{ return this.score ; }
+	public void setScore(int nouveauScore) { this.score = nouveauScore ; }
+	public int addScore(int aRajouter) { this.score += aRajouter ; return this.score ; }
+	public int getTemps()	{ return this.temps ; }
+	public void setTemps(int temps) { this.temps = temps ; }
+	public int getNbMotsDevines()	{ return this.nbMotsDevines ; }
+	public void setNbMotsDevines(int nbMotsDevines) { this.nbMotsDevines = nbMotsDevines ;}
 }

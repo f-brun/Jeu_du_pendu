@@ -26,12 +26,12 @@ public class EcranGagne implements Screen {
     														{   3, 2.5f,   2f, 1.5f,   1f, 0.5f}};
 
 	
-	private static Stage stage = null ;
-    private static Table table = null ;  //Table contenant les labels
+	private Stage stage = null ;
+    private Table table = null ;  //Table contenant les labels
 
-    private static Label lAffichageScore = null ;
-    private static Texture img = null ; 
-    private static Image imageGagne = null ;
+    private Label lAffichageScore = null ;
+    private Texture img = null ;
+    private Image imageGagne = null ;
 
     public static Pendu jeu ;	//reference aux donnees du jeu
     
@@ -39,9 +39,9 @@ public class EcranGagne implements Screen {
 
     	jeu = jeuEnCours ;	//reprend la reference au jeu pour toutes les methodes de la classe
  
-    	if (Pendu.getEcranGagne() == null) Pendu.setEcranGagne(this); 	//Ecrit la reference a l'ecran que l'on vient de creer
+    	Pendu.setEcranGagne(this); 	//Ecrit la reference a l'ecran que l'on vient de creer
     	
-    	if (stage == null) creeUI() ; //Si c'est le premier appel, on cree l'affichage
+    	creeUI() ; //C'est le premier appel, on cree l'affichage
     	actualiseUI() ;
     }
     private void creeUI() {

@@ -96,7 +96,7 @@ public class Pendu extends Game {
         niveau.setNbNiveaux(niveaux.length) ;
         
         score = new Score(niveau.getNumero(),dictionnaires.getDictionnaireActuel().langue) ;	//Par défaut on a un score nul
-        score.joueur = config.getValeurCle(CLE_JOUEUR, "Inconnu") ;	//Le nom du joueur est le dernier rentré (ou inconnu si aucun nom sauvegardé)
+        score.setJoueur(config.getValeurCle(CLE_JOUEUR, "Inconnu")) ;	//Le nom du joueur est le dernier rentré (ou inconnu si aucun nom sauvegardé)
 
         largeurEcran = Gdx.graphics.getWidth();
         hauteurEcran = Gdx.graphics.getHeight();
@@ -121,7 +121,7 @@ public class Pendu extends Game {
         this.setScreen(new EcranAccueil(this));	//Bascule sur l'écran d'accueil
     }
 
-    void ChargeImagesPendu() {
+    private void ChargeImagesPendu() {
     	int i;	//Compteur d'image indice de tableau
     	for (i = 0; i < NB_IMAGES; i++) {
 	        if (i < 10) {
@@ -150,8 +150,8 @@ public class Pendu extends Game {
     public static EcranGagne getEcranGagne() { return ecranGagne ; }
     public static EcranPerdu getEcranPerdu() { return ecranPerdu ; }
     public static EcranHighscores getEcranHighscores() { return ecranHighscores ; }
-    public static int getScore() { return score.score; }
-    public static int getNbErreurs() { return nbErreurs ; } ;
+    public static int getScore() { return score.getScore(); }
+    public static int getNbErreurs() { return nbErreurs ; } 
     public static Niveau getNiveau() { return niveau ; }
 
     public float getTaillePoliceTitreAdaptee(float contrainte,float tabTaillesAdaptees[][]) {
@@ -171,7 +171,7 @@ public class Pendu extends Game {
     public static void setEcranGagne(EcranGagne e) { ecranGagne = e ; }
     public static void setEcranPerdu(EcranPerdu e) { ecranPerdu = e ; }
     public static void setEcranHighscores(EcranHighscores e) { ecranHighscores = e ; }
-    public void setScore(int s) { score.score = s ; }
+    public void setScore(int s) { score.setScore(s) ; }
     public void setNiveau(Niveau n) { niveau = n ; }
 
     public void pause() {
